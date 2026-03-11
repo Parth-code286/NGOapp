@@ -1,19 +1,32 @@
-import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import Footer from './components/Footer';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
-export const App = () => {
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import Features from "./components/Features";
+import Footer from "./components/Footer";
+
+import ChatPage from "./chat/pages/ChatPage";
+
+const HomePage = () => {
   return (
-    <div className="landing-page">
+    <>
       <Navbar />
       <main>
         <Hero />
         <Features />
       </main>
       <Footer />
-    </div>
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/chat" element={<ChatPage />} />
+    </Routes>
   );
 };
 
