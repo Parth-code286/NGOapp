@@ -2,12 +2,14 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
-import supabase from "./src/config/supabase.js";
+import supabase from "./config/supabaseClient.js";
 import authRoutes from "./src/routes/authRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import gamificationRoutes from "./routes/gamificationRoutes.js";
 
 const app = express();
 
-// Middleware
+// ─── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
   credentials: true,
@@ -15,10 +17,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
+app.use("/events", eventRoutes);
+app.use("/gamification", gamificationRoutes);
 
-// Health check — verifies Supabase connectivity
+// ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", async (req, res) => {
     try {
         await supabase.from("_health_check").select("*").limit(1);
@@ -28,11 +32,20 @@ app.get("/health", async (req, res) => {
     }
 });
 
+// ─── 404 Handler ──────────────────────────────────────────────────────────────
+app.use((req, res) => {
+    res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+});
+
+// ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5053;
 
 app.listen(PORT, async () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`🔗 Auth routes: /api/auth/login | /api/auth/register/volunteer | /api/auth/register/ngo`);
+    console.log(`🎮 Gamification routes: /events/* | /gamification/*`);
+
+    // Verify Supabase connection on startup
     try {
         await supabase.from("_health_check").select("*").limit(1);
         console.log("✅ Supabase connected");
