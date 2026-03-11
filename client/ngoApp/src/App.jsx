@@ -1,19 +1,20 @@
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import Footer from './components/Footer';
+import { Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/auth/LoginPage';
+import SignupChoicePage from './pages/auth/SignupChoicePage';
+import VolunteerSignupPage from './pages/auth/VolunteerSignupPage';
+import NGOSignupPage from './pages/auth/NGOSignupPage';
 
 export const App = () => {
   return (
-    <div className="landing-page">
-      <Navbar />
-      <main>
-        <Hero />
-        <Features />
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupChoicePage />} />
+      <Route path="/signup/volunteer" element={<VolunteerSignupPage />} />
+      <Route path="/signup/ngo" element={<NGOSignupPage />} />
+    </Routes>
   );
 };
 

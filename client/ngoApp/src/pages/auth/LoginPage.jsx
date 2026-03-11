@@ -1,0 +1,33 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Login from '../../components/auth/Login';
+import './AuthPages.css';
+
+const LoginPage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="auth-page-wrapper animate-fade-in">
+      <div className="auth-page-header">
+        <div className="container" style={{ padding: '2rem 1.5rem', display: 'flex', justifyContent: 'space-between' }}>
+          <a href="/" className="logo">Impact<span className="text-primary">Hub</span></a>
+          <button className="text-link" onClick={() => navigate('/')}>&larr; Back to Home</button>
+        </div>
+      </div>
+      
+      <div className="auth-page-container">
+        <div className="auth-card">
+          <div className="auth-card-header">
+            <h2 className="auth-card-title">Welcome Back</h2>
+            <p className="auth-card-subtitle">Log in to your account</p>
+          </div>
+          <div className="auth-card-body">
+            <Login switchToSignup={() => navigate('/signup')} onClose={() => navigate('/')} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginPage;
