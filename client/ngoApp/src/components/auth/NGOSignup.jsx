@@ -41,7 +41,6 @@ const NGOSignup = ({ onBack, onClose }) => {
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      alert(`NGO "${data.user.name}" registered successfully!`);
       onClose();
     } catch (err) {
       setError(err.message);

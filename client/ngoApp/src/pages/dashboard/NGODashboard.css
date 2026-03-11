@@ -1,0 +1,61 @@
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-off);
+}
+
+.dashboard-main {
+  flex: 1;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* Custom scrollbar for main */
+.dashboard-main::-webkit-scrollbar {
+  width: 6px;
+}
+.dashboard-main::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+.dashboard-main::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Coming Soon */
+.coming-soon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 60vh;
+  padding: 3rem;
+  background-color: var(--bg-off);
+}
+
+.coming-soon-card {
+  background-color: var(--bg-pure);
+  border-radius: 24px;
+  padding: 4rem;
+  text-align: center;
+  max-width: 480px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.coming-soon-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.coming-soon-card h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.coming-soon-card p {
+  color: var(--text-muted);
+  line-height: 1.6;
+}

@@ -1,0 +1,36 @@
+/* Blue accent overrides for volunteer dashboard */
+.btn-vol {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-vol:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.text-vol {
+  color: #3b82f6;
+}
+
+.vol-avatar-blue {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+}
+
+.highlight-row {
+  background-color: #eff6ff;
+  border-radius: 12px;
+}
+
+.status-pill.absent {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}

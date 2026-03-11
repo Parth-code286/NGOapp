@@ -22,7 +22,7 @@ const VolunteerSignupPage = () => {
             <p className="auth-card-subtitle">Join events, track your attendance, and make a real impact.</p>
           </div>
           <div className="auth-card-body">
-            <VolunteerSignup onBack={() => navigate('/signup')} onClose={() => navigate('/dashboard')} />
+            <VolunteerSignup onBack={() => navigate('/signup')} onClose={() => navigate('/dashboard/volunteer')} />
           </div>
         </div>
       </div>

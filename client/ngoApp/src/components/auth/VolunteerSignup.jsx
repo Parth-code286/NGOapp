@@ -42,7 +42,6 @@ const VolunteerSignup = ({ onBack, onClose }) => {
       // Save token and redirect
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      alert(`Welcome, ${data.user.name}! Your volunteer account has been created.`);
       onClose();
     } catch (err) {
       setError(err.message);

@@ -29,7 +29,6 @@ const Login = ({ switchToSignup, onClose }) => {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      alert(`Welcome back, ${data.user.name}!`);
       onClose();
     } catch (err) {
       setError(err.message);

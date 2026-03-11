@@ -22,7 +22,15 @@ const LoginPage = () => {
             <p className="auth-card-subtitle">Log in to your account</p>
           </div>
           <div className="auth-card-body">
-            <Login switchToSignup={() => navigate('/signup')} onClose={() => navigate('/')} />
+            <Login
+                switchToSignup={() => navigate('/signup')}
+                onClose={() => {
+                  const user = JSON.parse(localStorage.getItem('user') || '{}');
+                  if (user.role === 'ngo') navigate('/dashboard/ngo');
+                  else if (user.role === 'volunteer') navigate('/dashboard/volunteer');
+                  else navigate('/');
+                }}
+              />
           </div>
         </div>
       </div>

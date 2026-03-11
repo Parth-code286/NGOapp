@@ -22,7 +22,7 @@ const NGOSignupPage = () => {
             <p className="auth-card-subtitle">Host events and track real-time engagement effortlessly.</p>
           </div>
           <div className="auth-card-body">
-            <NGOSignup onBack={() => navigate('/signup')} onClose={() => navigate('/dashboard')} />
+            <NGOSignup onBack={() => navigate('/signup')} onClose={() => navigate('/dashboard/ngo')} />
           </div>
         </div>
       </div>
