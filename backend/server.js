@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000"],
+  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
   credentials: true,
 }));
 app.use(express.json());
@@ -28,7 +28,7 @@ app.get("/health", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 8001;
+const PORT = process.env.PORT || 5053;
 
 app.listen(PORT, async () => {
     console.log(`✅ Server running on http://localhost:${PORT}`);
