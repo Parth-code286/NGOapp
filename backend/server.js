@@ -2,10 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
-import supabase from "./config/supabaseClient.js";
+import supabase from "./src/config/supabaseClient.js";
 import authRoutes from "./src/routes/authRoutes.js";
-import eventRoutes from "./routes/eventRoutes.js";
-import gamificationRoutes from "./routes/gamificationRoutes.js";
+import eventRoutes from "./src/routes/eventRoutes.js";
+import gamificationRoutes from "./src/routes/gamificationRoutes.js";
+import ngoProfileRoutes from "./src/routes/ngoProfileRoutes.js";
+import volunteerProfileRoutes from "./src/routes/volunteerProfileRoutes.js";
 
 const app = express();
 
@@ -21,6 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/events", eventRoutes);
 app.use("/gamification", gamificationRoutes);
+app.use("/api/ngo", ngoProfileRoutes);
+app.use("/api/volunteer", volunteerProfileRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", async (req, res) => {
@@ -44,6 +48,8 @@ app.listen(PORT, async () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`🔗 Auth routes: /api/auth/login | /api/auth/register/volunteer | /api/auth/register/ngo`);
     console.log(`🎮 Gamification routes: /events/* | /gamification/*`);
+    console.log(`🏢 NGO Profile routes: /api/ngo/*`);
+    console.log(`🙋 Volunteer Profile routes: /api/volunteer/*`);
 
     // Verify Supabase connection on startup
     try {

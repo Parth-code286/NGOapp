@@ -43,6 +43,38 @@ CREATE TABLE volunteers (
 );
 
 
+-- ─── ngos ─────────────────────────────────────────────────────
+CREATE TABLE ngos (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name                TEXT NOT NULL,
+    type                TEXT,
+    registration_date   DATE,
+    registration_no     TEXT,
+    pan                 TEXT,
+    tan                 TEXT,
+    reg_12a             TEXT,
+    official_email      TEXT UNIQUE NOT NULL,
+    phone               TEXT,
+    website             TEXT,
+    address             TEXT,
+    city                TEXT,
+    state               TEXT,
+    pincode             TEXT,
+    auth_person_name    TEXT,
+    auth_person_mobile  TEXT,
+    auth_person_email   TEXT,
+    password_hash       TEXT NOT NULL,
+    logo_url            TEXT,
+    description         TEXT,
+    mission             TEXT,
+    founded_year        INTEGER,
+    total_volunteers    INTEGER DEFAULT 0,
+    total_events        INTEGER DEFAULT 0,
+    is_verified         BOOLEAN DEFAULT FALSE,
+    created_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+
 -- ─── events ───────────────────────────────────────────────────
 CREATE TABLE events (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
