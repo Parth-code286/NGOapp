@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import VolunteerSidebar from './VolunteerSidebar';
 import VolunteerOverview from './VolunteerOverview';
 import DesignCalendar from './DesignCalendar';
+import BrowseEvents from './BrowseEvents';
+import RegisteredEvents from './RegisteredEvents';
 import '../dashboard/NGODashboard.css';
 
 const ComingSoon = ({ title }) => (
@@ -21,8 +23,8 @@ const VolunteerDashboard = () => {
     switch (activeSection) {
       case 'overview':       return <VolunteerOverview />;
       case 'calendar':       return <DesignCalendar />;
-      case 'browse':         return <ComingSoon title="Browse Events" />;
-      case 'registered':     return <ComingSoon title="Registered Events" />;
+      case 'browse':         return <BrowseEvents />;
+      case 'registered':     return <RegisteredEvents />;
       case 'certificates':   return <ComingSoon title="Certificates Earned" />;
       case 'visualization':  return <ComingSoon title="Event Visualization" />;
       case 'community':      return <ComingSoon title="Community & Leaderboard" />;
