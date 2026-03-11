@@ -13,11 +13,7 @@
     "@supabase/supabase-js": "^2.39.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-<<<<<<< HEAD
     "react-router-dom": "^6.30.3"
-=======
-    "react-router-dom": "^7.13.1"
->>>>>>> 0eb8135dd17a9b57321f735cecfaac8c2676afee
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
