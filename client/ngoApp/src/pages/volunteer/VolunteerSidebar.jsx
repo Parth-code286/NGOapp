@@ -31,21 +31,35 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
   const [unreadCount, setUnreadCount] = React.useState(0);
 
   React.useEffect(() => {
-    if (user.id) {
-      const fetchUnread = async () => {
-        try {
-          const res = await fetch(`http://localhost:5053/api/notifications/${user.id}`);
-          const data = await res.json();
-          if (res.ok) {
-            const count = (data.notifications || []).filter(n => !n.is_read).length;
-            setUnreadCount(count);
-          }
-        } catch (err) { console.error(err); }
-      };
-      fetchUnread();
-      const interval = setInterval(fetchUnread, 30000); // Poll every 30s
-      return () => clearInterval(interval);
-    }
+    if (!user.id) return;
+
+    const fetchUnread = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_read', false);
+        
+        if (!error) setUnreadCount(count || 0);
+      } catch (err) { console.error('Error fetching notifications:', err); }
+    };
+
+    fetchUnread();
+
+    const channel = supabase
+      .channel(`user-notifications-${user.id}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'notifications', 
+        filter: `user_id=eq.${user.id}` 
+      }, () => fetchUnread())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user.id]);
 
   const handleLogout = () => {

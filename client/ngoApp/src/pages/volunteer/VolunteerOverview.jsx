@@ -1,44 +1,133 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import '../dashboard/DashboardOverview.css';
 import './VolunteerOverview.css';
 
-const stats = [
-  { label: 'Events Registered',   value: '12',  icon: '📋', change: '+2 this month',    color: 'stat-blue' },
-  { label: 'Events Attended',     value: '9',   icon: '✅', change: '+1 this month',    color: 'stat-green' },
-  { label: 'Hours Volunteered',   value: '47',  icon: '⏱️', change: '+6h this month',   color: 'stat-yellow' },
-  { label: 'Certificates Earned', value: '5',   icon: '🎓', change: '+1 recently',      color: 'stat-purple' },
-  { label: 'Impact Points',       value: '1,320',icon: '🏆',change: '+240 this month',  color: 'stat-orange' },
-  { label: 'Leaderboard Rank',    value: '#14', icon: '🥇', change: '↑ 3 positions',    color: 'stat-teal' },
-];
-
-const upcomingEvents = [
-  { name: 'Tree Plantation Drive',      date: 'Mar 14, 2026', org: 'GreenEarth NGO',   status: 'registered' },
-  { name: 'Blood Donation Camp',        date: 'Mar 18, 2026', org: 'HealthFirst',       status: 'registered' },
-  { name: 'Night Shelter Volunteering', date: 'Mar 22, 2026', org: 'CareBridge',        status: 'open' },
-  { name: 'Digital Literacy Campaign',  date: 'Mar 28, 2026', org: 'EduReach',          status: 'open' },
-];
-
-const pastEvents = [
-  { name: 'Beach Cleanup Drive',     date: 'Mar 10, 2026', hours: 5,  points: 150, attended: true },
-  { name: 'Food Distribution Drive', date: 'Feb 20, 2026', hours: 4,  points: 120, attended: true },
-  { name: 'Animal Shelter Help',     date: 'Feb 12, 2026', hours: 3,  points: 90,  attended: false },
-];
-
-const leaderboard = [
-  { rank: 1, name: 'Ananya Sharma',  points: 3200, badge: '🥇' },
-  { rank: 2, name: 'Rahul Mehta',    points: 2980, badge: '🥈' },
-  { rank: 3, name: 'Priya Singh',    points: 2740, badge: '🥉' },
-  { rank: 14, name: 'You',           points: 1320, badge: '⭐', highlight: true },
-];
-
 const VolunteerOverview = ({ onSectionChange }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState([
+    { label: 'Events Registered',   value: '0',  icon: '📋', color: 'stat-blue' },
+    { label: 'Events Attended',     value: '0',  icon: '✅', color: 'stat-green' },
+    { label: 'Hours Volunteered',   value: '0',  icon: '⏱️', color: 'stat-yellow' },
+    { label: 'Certificates Earned', value: '0',  icon: '🎓', color: 'stat-purple' },
+    { label: 'Impact Points',       value: '0',  icon: '🏆', color: 'stat-orange' },
+    { label: 'Leaderboard Rank',    value: '...', icon: '🥇', color: 'stat-teal' },
+  ]);
+
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  const fetchVolunteerData = async () => {
+    try {
+      // 1. Fetch Volunteer Profile (Points, Attended, rank)
+      const { data: volProfile } = await supabase
+        .from('volunteers')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // 2. Fetch Leaderboard Rank
+      const { data: allVols } = await supabase
+        .from('volunteers')
+        .select('id, name, points')
+        .order('points', { ascending: false });
+      
+      const rank = allVols?.findIndex(v => v.id === user.id) + 1 || '...';
+      const topVols = allVols?.slice(0, 5).map((v, i) => ({
+        rank: i + 1,
+        name: v.id === user.id ? 'You' : v.name,
+        points: v.points,
+        badge: i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '⭐',
+        highlight: v.id === user.id
+      })) || [];
+
+      // 3. Fetch Registrations (Registered count, Upcoming)
+      const { data: registrations } = await supabase
+        .from('event_registrations')
+        .select('*, events(title, event_date, ngo_id, ngos(name))')
+        .eq('volunteer_id', user.id);
+
+      const registeredCount = registrations?.length || 0;
+      const upcoming = registrations?.filter(r => new Date(r.events.event_date) >= new Date())
+        .map(r => ({
+          name: r.events.title,
+          date: new Date(r.events.event_date).toLocaleDateString(),
+          org: r.events.ngos?.name || 'Unknown',
+          status: r.status
+        })) || [];
+
+      // 4. Fetch Past Events (Attendance)
+      const { data: attendance } = await supabase
+        .from('attendance')
+        .select('*, events(title, event_date)')
+        .eq('volunteer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      const past = attendance?.map(a => ({
+        name: a.events.title,
+        date: new Date(a.events.event_date).toLocaleDateString(),
+        hours: 4, // Placeholder for hours per event
+        points: 100, // Placeholder
+        attended: a.verified
+      })) || [];
+
+      // 5. Fetch Certificates
+      const { count: certCount } = await supabase
+        .from('certificates')
+        .select('*', { count: 'exact', head: true })
+        .eq('volunteer_id', user.id);
+
+      setStats([
+        { label: 'Events Registered',   value: registeredCount, icon: '📋', color: 'stat-blue' },
+        { label: 'Events Attended',     value: volProfile?.events_attended || 0, icon: '✅', color: 'stat-green' },
+        { label: 'Hours Volunteered',   value: (volProfile?.events_attended || 0) * 4, icon: '⏱️', color: 'stat-yellow' },
+        { label: 'Certificates Earned', value: certCount || 0, icon: '🎓', color: 'stat-purple' },
+        { label: 'Impact Points',       value: volProfile?.points.toLocaleString() || 0, icon: '🏆', color: 'stat-orange' },
+        { label: 'Leaderboard Rank',    value: `#${rank}`, icon: '🥇', color: 'stat-teal' },
+      ]);
+
+      setUpcomingEvents(upcoming.slice(0, 4));
+      setPastEvents(past.slice(0, 5));
+      setLeaderboard(topVols);
+
+    } catch (error) {
+      console.error('Error fetching volunteer data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVolunteerData();
+
+    const channel = supabase
+      .channel('volunteer-realtime')
+      .on('postgres_changes', { event: '*', table: 'volunteers', filter: `id=eq.${user.id}` }, () => fetchVolunteerData())
+      .on('postgres_changes', { event: '*', table: 'event_registrations', filter: `volunteer_id=eq.${user.id}` }, () => fetchVolunteerData())
+      .on('postgres_changes', { event: '*', table: 'attendance', filter: `volunteer_id=eq.${user.id}` }, () => fetchVolunteerData())
+      .on('postgres_changes', { event: '*', table: 'certificates', filter: `volunteer_id=eq.${user.id}` }, () => fetchVolunteerData())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  if (loading) return <div className="loading-state">Loading your impact profile...</div>;
 
   return (
     <div className="overview-container">
       <div className="overview-header">
         <div>
-          <h1 className="overview-title">Hi, <span className="text-vol">{user.name || 'Volunteer'}</span> 👋</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+            <h1 className="overview-title" style={{ margin: 0 }}>Hi, <span className="text-vol">{user.name || 'Volunteer'}</span> 👋</h1>
+            <div className="live-indicator">
+              <span className="ping-dot"></span>
+              LIVE IMPACT
+            </div>
+          </div>
           <p className="overview-subtitle">Here's your volunteering activity and upcoming events.</p>
         </div>
         <button className="btn btn-vol browse-btn" onClick={() => onSectionChange('browse')}>
@@ -55,7 +144,7 @@ const VolunteerOverview = ({ onSectionChange }) => {
               <div className="stat-value">{stat.value}</div>
             </div>
             <div className="stat-label-text">{stat.label}</div>
-            <div className="stat-change">↑ {stat.change}</div>
+            <div className="stat-change">Live Updates</div>
           </div>
         ))}
       </div>
@@ -64,8 +153,8 @@ const VolunteerOverview = ({ onSectionChange }) => {
         {/* Upcoming Events */}
         <div className="overview-card">
           <div className="card-header">
-            <h3 className="card-title">Upcoming Events</h3>
-            <button className="text-link">Browse all →</button>
+            <h3 className="card-title">My Schedule</h3>
+            <button className="text-link" onClick={() => onSectionChange('registered')}>View all →</button>
           </div>
           <table className="data-table">
             <thead>
@@ -77,18 +166,22 @@ const VolunteerOverview = ({ onSectionChange }) => {
               </tr>
             </thead>
             <tbody>
-              {upcomingEvents.map((ev, i) => (
+              {upcomingEvents.length > 0 ? upcomingEvents.map((ev, i) => (
                 <tr key={i}>
                   <td className="event-name">{ev.name}</td>
                   <td>{ev.date}</td>
                   <td>{ev.org}</td>
                   <td>
-                    <span className={`status-pill ${ev.status === 'registered' ? 'completed' : 'upcoming'}`}>
-                      {ev.status === 'registered' ? 'Registered' : 'Open'}
+                    <span className={`status-pill ${ev.status === 'approved' ? 'completed' : 'upcoming'}`}>
+                      {ev.status === 'approved' ? 'Approved' : ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
                     </span>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>No upcoming events found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -96,8 +189,8 @@ const VolunteerOverview = ({ onSectionChange }) => {
         {/* Leaderboard */}
         <div className="overview-card">
           <div className="card-header">
-            <h3 className="card-title">Community Leaderboard</h3>
-            <button className="text-link">Full view →</button>
+            <h3 className="card-title">Top Players</h3>
+            <button className="text-link" onClick={() => onSectionChange('leaderboard')}>Rankings →</button>
           </div>
           <div className="volunteer-list">
             {leaderboard.map((v, i) => (
@@ -118,8 +211,8 @@ const VolunteerOverview = ({ onSectionChange }) => {
       {/* Past Events */}
       <div className="overview-card" style={{ marginBottom: '2rem' }}>
         <div className="card-header">
-          <h3 className="card-title">Past Participation</h3>
-          <button className="text-link">View all →</button>
+          <h3 className="card-title">Recent History</h3>
+          <button className="text-link">Full history →</button>
         </div>
         <table className="data-table">
           <thead>
@@ -127,12 +220,12 @@ const VolunteerOverview = ({ onSectionChange }) => {
               <th>Event</th>
               <th>Date</th>
               <th>Hours</th>
-              <th>Points Earned</th>
-              <th>Attended</th>
+              <th>Points</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {pastEvents.map((ev, i) => (
+            {pastEvents.length > 0 ? pastEvents.map((ev, i) => (
               <tr key={i}>
                 <td className="event-name">{ev.name}</td>
                 <td>{ev.date}</td>
@@ -140,30 +233,34 @@ const VolunteerOverview = ({ onSectionChange }) => {
                 <td>+{ev.points}</td>
                 <td>
                   <span className={`status-pill ${ev.attended ? 'completed' : 'absent'}`}>
-                    {ev.attended ? '✅ Present' : '❌ Absent'}
+                    {ev.attended ? '✅ Verified' : '❌ Pending'}
                   </span>
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>No past activity yet.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Quick Actions */}
       <div className="quick-actions-row">
-        <div className="quick-card blue">
+        <div className="quick-card blue" onClick={() => onSectionChange('browse')}>
           <div className="qc-icon">🔍</div>
           <div><div className="qc-title">Browse Events</div><div className="qc-sub">Find events near you</div></div>
         </div>
-        <div className="quick-card green">
+        <div className="quick-card green" onClick={() => onSectionChange('attendance')}>
           <div className="qc-icon">✅</div>
           <div><div className="qc-title">Mark Attendance</div><div className="qc-sub">Enter attendance code</div></div>
         </div>
-        <div className="quick-card yellow">
+        <div className="quick-card yellow" onClick={() => onSectionChange('certificates')}>
           <div className="qc-icon">🎓</div>
           <div><div className="qc-title">My Certificates</div><div className="qc-sub">View & download</div></div>
         </div>
-        <div className="quick-card purple">
+        <div className="quick-card purple" onClick={() => onSectionChange('leaderboard')}>
           <div className="qc-icon">🏆</div>
           <div><div className="qc-title">Leaderboard</div><div className="qc-sub">See your ranking</div></div>
         </div>
