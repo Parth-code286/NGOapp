@@ -18,7 +18,7 @@ const BADGE_ICONS = {
   'Super Star':    '💫',
 };
 
-const Community = () => {
+const Community = ({ onSectionChange }) => {
   const user  = JSON.parse(localStorage.getItem('user') || '{}');
   const token = localStorage.getItem('token');
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
@@ -85,8 +85,18 @@ const Community = () => {
   return (
     <div className="cm-wrapper">
       <div className="cm-header animate-fade-in">
-        <h1 className="cm-title">Community Hub</h1>
-        <p className="cm-subtitle">Your personal impact trail and achievements.</p>
+        <div className="cm-header-flex">
+          <div>
+            <h1 className="cm-title">Community Hub</h1>
+            <p className="cm-subtitle">Your personal impact trail and achievements.</p>
+          </div>
+          <button 
+            className="cm-leaderboard-btn"
+            onClick={() => onSectionChange('leaderboard')}
+          >
+            🏆 Leaderboard
+          </button>
+        </div>
       </div>
 
       <div className="cm-stats-grid">

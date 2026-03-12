@@ -298,7 +298,7 @@ const CreateEvent = () => {
           <div className="ce-grid-2">
             <div className="ce-field">
               <label>Materials Provided by NGO</label>
-              <input type="text" name="materials_provided" className="ce-input" placeholder="e.g. gloves, bags, food, certificates" />
+              <input type="text" name="materials_provided" className="ce-input" placeholder="e.g. gloves, bags, food, credentials" />
             </div>
             <div className="ce-field">
               <label>Things Volunteers Must Bring</label>
@@ -311,7 +311,6 @@ const CreateEvent = () => {
           </div>
           <div className="ce-toggle-row">
             {[
-              { label: 'Certificate Provided', name: 'certificate' },
               { label: 'Meals Provided', name: 'meals' },
               { label: 'Travel Allowance', name: 'travel' },
               { label: 'Allow Waitlist', name: 'waitlist' },

@@ -192,7 +192,6 @@ const BrowseEvents = () => {
                       <p className="be-description">{ev.description?.slice(0, 120)}{ev.description?.length > 120 ? '…' : ''}</p>
 
                       <div className="be-perks">
-                        {ev.certificate_provided && <span className="perk-tag">🎓 Certificate</span>}
                         {ev.meals_provided       && <span className="perk-tag">🍽 Meals</span>}
                         {ev.travel_allowance     && <span className="perk-tag">🚌 Travel</span>}
                       </div>

@@ -10,7 +10,6 @@ const VolunteerOverview = ({ onSectionChange }) => {
     { label: 'Events Registered',   value: '0',  icon: '📋', color: 'stat-blue' },
     { label: 'Events Attended',     value: '0',  icon: '✅', color: 'stat-green' },
     { label: 'Hours Volunteered',   value: '0',  icon: '⏱️', color: 'stat-yellow' },
-    { label: 'Certificates Earned', value: '0',  icon: '🎓', color: 'stat-purple' },
     { label: 'Impact Points',       value: '0',  icon: '🏆', color: 'stat-orange' },
     { label: 'Leaderboard Rank',    value: '...', icon: '🥇', color: 'stat-teal' },
   ]);
@@ -241,10 +240,6 @@ const VolunteerOverview = ({ onSectionChange }) => {
         <div className="quick-card green" onClick={() => onSectionChange('attendance')}>
           <div className="qc-icon">✅</div>
           <div><div className="qc-title">Mark Attendance</div><div className="qc-sub">Enter attendance code</div></div>
-        </div>
-        <div className="quick-card yellow" onClick={() => onSectionChange('certificates')}>
-          <div className="qc-icon">🎓</div>
-          <div><div className="qc-title">My Certificates</div><div className="qc-sub">View & download</div></div>
         </div>
         <div className="quick-card purple" onClick={() => onSectionChange('leaderboard')}>
           <div className="qc-icon">🏆</div>

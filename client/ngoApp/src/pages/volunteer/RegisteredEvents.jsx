@@ -126,7 +126,6 @@ const RegisteredEvents = () => {
                           <span>⏱ {ev.volunteering_hours}h</span>
                         </div>
                         <div className="re-perks">
-                          {ev.certificate_provided && <span className="perk-tag">🎓 Certificate</span>}
                           {ev.meals_provided       && <span className="perk-tag">🍽 Meals</span>}
                           {ev.travel_allowance     && <span className="perk-tag">🚌 Travel</span>}
                         </div>
@@ -186,9 +185,6 @@ const RegisteredEvents = () => {
                       </div>
                       <div className="re-card-right" style={{ alignItems: 'flex-end', gap: '0.5rem' }}>
                         <span className={`re-mode ${ev.mode?.toLowerCase()}`}>{ev.mode}</span>
-                        {ev.certificate_provided && reg.status === 'approved' && (
-                          <span className="re-cert-badge">🎓 Certificate Earned</span>
-                        )}
                         <button 
                           className="re-cancel-btn"
                           style={{ padding: '0.4rem 0.6rem', color: '#0f172a', backgroundColor: '#f8fafc', borderColor: '#e2e8f0', marginTop: 'auto' }}
