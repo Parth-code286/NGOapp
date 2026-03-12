@@ -150,6 +150,11 @@ const VolunteerCrises = () => {
 
             {!successMsg && (
               <form onSubmit={handleDonate}>
+                {selectedCrisis.upi_id && (
+                  <div className="alert alert-info" style={{ marginBottom: '1rem', background: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd' }}>
+                    <strong>Direct UPI Payment:</strong> {selectedCrisis.upi_id}
+                  </div>
+                )}
                 <div className="form-group">
                   <label>Donation Amount (₹)</label>
                   <input 
