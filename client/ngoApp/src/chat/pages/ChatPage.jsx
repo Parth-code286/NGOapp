@@ -38,32 +38,43 @@ const ChatPage = () => {
   const [activePartnerId, setActivePartnerId] = useState(null);
   const messagesEndRef = useRef(null);
 
-  /* Load users */
+  /* Load all chat_users and auto-identify current user from localStorage */
   useEffect(() => {
     const fetch = async () => {
       const { data } = await supabase.from("chat_users").select("*");
       const rawUsers = data || [];
 
-      // Deduplicate by user_ref_id — prefer the canonical row (id === user_ref_id)
+      // Deduplicate by user_ref_id
       const seen = new Map();
       for (const u of rawUsers) {
         if (!seen.has(u.user_ref_id)) {
           seen.set(u.user_ref_id, u);
         } else {
-          // Prefer canonical row where id === user_ref_id
-          if (u.id === u.user_ref_id) {
-            seen.set(u.user_ref_id, u);
-          }
+          if (u.id === u.user_ref_id) seen.set(u.user_ref_id, u);
         }
       }
-
-      // Filter out test/ghost users that aren't real — keep only those with proper UUIDs
-      const unique = [...seen.values()].filter(u =>
-        // Skip the "Test Volunteer" ghost entry that was created before seeding
-        u.name !== "Test Volunteer"
-      );
-
+      const unique = [...seen.values()].filter((u) => u.name !== "Test Volunteer");
       setUsers(unique);
+
+      // Auto-detect logged-in user from localStorage
+      try {
+        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        if (stored?.id) {
+          // Match by user_ref_id (the volunteer/ngo table ID stored at login)
+          const matched = unique.find((u) => u.user_ref_id === stored.id);
+          if (matched) {
+            setCurrentUser(matched);
+          } else {
+            // Fallback: match by name if ref not found
+            const byName = unique.find(
+              (u) => u.name?.toLowerCase() === stored.name?.toLowerCase()
+            );
+            if (byName) setCurrentUser(byName);
+          }
+        }
+      } catch (_) {
+        /* no stored user – guest mode */
+      }
     };
     fetch();
   }, []);
@@ -151,16 +162,10 @@ const ChatPage = () => {
     return () => supabase.removeChannel(channel);
   }, [conversation]);
 
-  /* Who can the current user DM? */
+  /* All other users are DM-able — no role filter */
   const getTalkableUsers = () => {
     if (!currentUser) return [];
-    return users.filter((u) => {
-      if (u.id === currentUser.id) return false;
-      if (currentUser.user_type === "ngo") return u.user_type === "volunteer";
-      if (currentUser.user_type === "volunteer") return u.user_type === "ngo";
-      if (currentUser.user_type === "admin") return true;
-      return false;
-    });
+    return users.filter((u) => u.id !== currentUser.id);
   };
 
   const canSeeGroup =
@@ -181,32 +186,8 @@ const ChatPage = () => {
           </div>
         </div>
 
-        {/* User switcher (dev/demo helper) */}
-        <div className="user-switcher">
-          <label>Logged in as</label>
-          <select
-            value={currentUser?.id ?? ""}
-            onChange={(e) => {
-              const u = users.find(
-                (u) => String(u.id) === String(e.target.value)
-              );
-              setCurrentUser(u || null);
-              setConversation(null);
-              setMessages([]);
-              setActivePartnerId(null);
-            }}
-          >
-            <option value="">— Select user —</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name} ({u.user_type})
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Active user pill */}
-        {currentUser && (
+        {currentUser ? (
           <div className="current-user-badge">
             <div
               className={`user-avatar-sm ${getAvatarClass(currentUser.user_type)}`}
@@ -220,6 +201,14 @@ const ChatPage = () => {
               >
                 {currentUser.user_type}
               </span>
+            </div>
+          </div>
+        ) : (
+          <div className="current-user-badge" style={{ opacity: 0.6 }}>
+            <div className="user-avatar-sm avatar-default">?</div>
+            <div className="info">
+              <div className="name">Not logged in</div>
+              <span className="role-badge">Please log in first</span>
             </div>
           </div>
         )}
@@ -298,12 +287,12 @@ const ChatPage = () => {
             <h3>
               {currentUser
                 ? "Select a conversation"
-                : "Choose your identity first"}
+                : "Please log in to use chat"}
             </h3>
             <p>
               {currentUser
                 ? "Pick a group or a direct message from the sidebar to start chatting."
-                : 'Use the "Logged in as" dropdown to pick who you are.'}
+                : "You need to be logged in to access the chat."}
             </p>
           </div>
         ) : (

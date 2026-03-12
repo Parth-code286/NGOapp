@@ -7,6 +7,7 @@ import VolunteerSignupPage from './pages/auth/VolunteerSignupPage';
 import NGOSignupPage from './pages/auth/NGOSignupPage';
 import NGODashboard from './pages/dashboard/NGODashboard';
 import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
+import ChatPage from './chat/pages/ChatPage';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       <Route path="/signup/ngo" element={<NGOSignupPage />} />
       <Route path="/dashboard/ngo" element={<NGODashboard />} />
       <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
+      <Route path="/chat" element={<ChatPage/>} />
     </Routes>
   );
 };
