@@ -7,7 +7,7 @@ const navItems = [
   { id: 'create-event', label: 'Create Event', icon: '➕' },
   { id: 'manage-events', label: 'Manage Events', icon: '📋' },
   { id: 'browse-volunteers', label: 'Browse Volunteers', icon: '🔍' },
-  { id: 'attendance', label: 'Attendance Tracking', icon: '✅' },
+  { id: 'attendance', label: 'Attendance Tracking', icon: '✅', url: 'https://ngo-attendance.vercel.app' },
   { id: 'visualization', label: 'Event Visualization', icon: '📈' },
   { id: 'chat', label: 'Chat Section', icon: '💬' },
   { id: 'volunteers', label: 'Volunteer Participation', icon: '🤝' },
@@ -59,7 +59,13 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
           <button
             key={item.id}
             className={`sidebar-item ${activeSection === item.id ? 'active' : ''}`}
-            onClick={() => onSectionChange(item.id)}
+            onClick={() => {
+              if (item.url) {
+                window.open(item.url, '_blank');
+              } else {
+                onSectionChange(item.id);
+              }
+            }}
           >
             <span className="sidebar-icon">{item.icon}</span>
             <span className="sidebar-label">{item.label}</span>

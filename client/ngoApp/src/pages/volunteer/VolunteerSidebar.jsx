@@ -11,10 +11,11 @@ const volunteerNavItems = [
   { id: 'ngo-listing', label: 'NGO Listing',           icon: '🏢' },
   { id: 'certificates',label: 'Certificates Earned',   icon: '🎓' },
   { id: 'visualization',label: 'Event Visualization',  icon: '📈' },
-  { id: 'community',   label: 'Community & Leaderboard',icon: '🏆' },
+  { id: 'community',   label: 'Community Hub',         icon: '🤝' },
+  { id: 'leaderboard', label: 'Leaderboard',           icon: '🏆' },
   { id: 'chat',        label: 'Chat Section',          icon: '💬' },
   { id: 'notifications',label: 'Notifications',        icon: '🔔' },
-  { id: 'attendance',  label: 'Attendance Section',    icon: '✅' },
+  { id: 'attendance',  label: 'Attendance Section',    icon: '✅', url: 'https://ngo-attendance.vercel.app' },
 ];
 
 const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
@@ -58,7 +59,13 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
           <button
             key={item.id}
             className={`sidebar-item ${activeSection === item.id ? 'active' : ''}`}
-            onClick={() => onSectionChange(item.id)}
+            onClick={() => {
+              if (item.url) {
+                window.open(item.url, '_blank');
+              } else {
+                onSectionChange(item.id);
+              }
+            }}
           >
             <span className="sidebar-icon">{item.icon}</span>
             <span className="sidebar-label">{item.label}</span>

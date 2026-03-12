@@ -1,0 +1,274 @@
+/* ═══════════════════════════════════════════════════════════
+   Leaderboard — Premium Aesthetic Overhaul
+   ═══════════════════════════════════════════════════════════ */
+
+.lb-wrapper {
+  padding: 3rem;
+  background-color: var(--bg-off);
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative Blobs */
+.lb-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(252, 186, 3, 0.1) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.lb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 3.5rem;
+  border-radius: 40px;
+  color: white;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  animation: lb-slide-down 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lb-header::after {
+  content: "";
+  position: absolute;
+  bottom: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: var(--primary);
+  filter: blur(100px);
+  opacity: 0.2;
+}
+
+.lb-title {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lb-subtitle {
+  font-size: 1.2rem;
+  font-weight: 500;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.lb-trophy {
+  font-size: 5rem;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+  animation: lb-float 3s ease-in-out infinite;
+}
+
+@keyframes lb-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.lb-card {
+  background: white;
+  border-radius: 36px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.02);
+  animation: lb-fade-up 0.8s ease-out;
+}
+
+.lb-table-container {
+  overflow-x: auto;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.lb-table th {
+  padding: 1.75rem 2.5rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 800;
+  background: #fcfcfc;
+  border-bottom: 2px solid var(--bg-off);
+}
+
+.lb-table td {
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  vertical-align: middle;
+  transition: all 0.3s ease;
+}
+
+/* ─── Rank Badge ─── */
+.lb-rank-badge {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.2rem;
+  border-radius: 18px;
+  background: var(--bg-off);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.lb-rank-badge.gold {
+  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+  color: #92400e;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.lb-rank-badge.silver {
+  background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 100%);
+  color: #111827;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 12px rgba(156, 163, 175, 0.3);
+}
+
+.lb-rank-badge.bronze {
+  background: linear-gradient(135deg, #ffedd5 0%, #f97316 100%);
+  color: #7c2d12;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+/* ─── User Cell ─── */
+.lb-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.lb-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.lb-name {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 1.15rem;
+  letter-spacing: -0.3px;
+}
+
+.lb-self-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  margin-left: 1rem;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Points & Levels ─── */
+.lb-points .pts {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.lb-points .label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: 0.4rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.lb-level-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.lb-level-tag.l1 { background: #ecfdf5; color: #065f46; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1); }
+.lb-level-tag.l2 { background: #eff6ff; color: #1e40af; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1); }
+.lb-level-tag.l3 { background: #fef2f2; color: #991b1b; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.1); }
+.lb-level-tag.l4 { background: #1e293b; color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+/* ─── Row Effects ─── */
+tr.top-tier td {
+  background: rgba(252, 186, 3, 0.02);
+}
+
+tr.self {
+  background: rgba(37, 99, 235, 0.03) !important;
+}
+
+tr.self td:first-child {
+  border-left: 6px solid #2563eb;
+}
+
+.lb-table tbody tr:hover td {
+  background-color: #fcfcfc;
+  transform: scale(1.002);
+  z-index: 10;
+}
+
+/* ─── Misc ─── */
+.lb-empty {
+  text-align: center;
+  padding: 6rem !important;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.lb-footer-note {
+  margin-top: 2.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* ─── Animations ─── */
+@keyframes lb-slide-down {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lb-fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .lb-wrapper { padding: 1.5rem; }
+  .lb-header { padding: 2rem; border-radius: 28px; }
+  .lb-title { font-size: 2.2rem; }
+  .lb-table td, .lb-table th { padding: 1rem 1.5rem; }
+}

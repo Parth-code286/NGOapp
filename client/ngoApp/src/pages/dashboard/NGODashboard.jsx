@@ -9,6 +9,8 @@ import AnalyticsHeatmap from './AnalyticsHeatmap';
 import VolunteerNotifications from '../volunteer/VolunteerNotifications';
 import EventVisualization from '../volunteer/EventVisualization';
 import VolunteerParticipation from './VolunteerParticipation';
+import ImpactAnalytics from './ImpactAnalytics';
+import ImpactScore from './ImpactScore';
 import './NGODashboard.css';
 
 // Placeholder section for unbuilt features
@@ -42,15 +44,13 @@ const NGODashboard = () => {
       case 'volunteers':
         return <VolunteerParticipation />;
       case 'analytics':
-        return <ComingSoon title="Impact Analytical Dashboard" />;
+        return <ImpactAnalytics />;
       case 'heatmap':
         return <AnalyticsHeatmap />;
       case 'impact-score':
-        return <ComingSoon title="Community Impact Score" />;
+        return <ImpactScore />;
       case 'certificates':
         return <ComingSoon title="Volunteer Certificate Generator" />;
-      case 'heatmap':
-        return <ComingSoon title="Category Heat Map" />;
       case 'notifications':
         return <VolunteerNotifications />;
       case 'profile':

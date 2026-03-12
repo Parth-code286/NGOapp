@@ -1,5 +1,5 @@
 import express from "express";
-import { getVolunteerHeatmap, getAdvancedStats } from "../controllers/analyticsController.js";
+import { getVolunteerHeatmap, getAdvancedStats, getCommunityImpactScore } from "../controllers/analyticsController.js";
 
 const router = express.Router();
 
@@ -10,5 +10,9 @@ router.get("/volunteer-heatmap", getVolunteerHeatmap);
 // GET /api/analytics/stats
 // Returns global advanced stats
 router.get("/stats", getAdvancedStats);
+
+// GET /api/analytics/impact-score
+// Returns global impact score
+router.get("/impact-score", getCommunityImpactScore);
 
 export default router;

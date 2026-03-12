@@ -201,3 +201,64 @@ export const getAdvancedStats = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/analytics/impact-score
+// Calculates a platform-wide social impact score
+export const getCommunityImpactScore = async (req, res) => {
+  try {
+    // 1. Sum of all volunteer points
+    const { data: pointsData, error: pointsError } = await supabase
+      .from("volunteers")
+      .select("points");
+    if (pointsError) throw pointsError;
+    const totalPoints = pointsData.reduce((sum, v) => sum + (v.points || 0), 0);
+
+    // 2. Count of approved registrations
+    const { count: approvedCount, error: approvedError } = await supabase
+      .from("event_registrations")
+      .select("*", { count: 'exact', head: true })
+      .eq("status", "approved");
+    if (approvedError) throw approvedError;
+
+    // 3. Count of events
+    const { count: eventCount, error: eventError } = await supabase
+      .from("events")
+      .select("*", { count: 'exact', head: true });
+    if (eventError) throw eventError;
+
+    // 4. Unique participating cities
+    const { data: cityData, error: cityError } = await supabase
+      .from("volunteers")
+      .select("city")
+      .not("city", "is", null);
+    if (cityError) throw cityError;
+    const uniqueCities = new Set(cityData.map(v => v.city.trim().toUpperCase())).size;
+
+    // Calculate Scores (Weights can be adjusted)
+    const contributionScore = Math.round(totalPoints / 10); // 1 score unit per 10 points
+    const participationScore = (approvedCount || 0) * 50;  // 50 score units per approved participant
+    const diversityScore = uniqueCities * 100;           // 100 score units per city reached
+    const frequencyScore = (eventCount || 0) * 200;       // 200 score units per event hosted
+
+    const totalImpactScore = contributionScore + participationScore + diversityScore + frequencyScore;
+
+    res.status(200).json({
+      totalImpactScore,
+      breakdown: {
+        contributionScore,
+        participationScore,
+        diversityScore,
+        frequencyScore
+      },
+      metrics: {
+        totalPoints,
+        approvedCount: approvedCount || 0,
+        eventCount: eventCount || 0,
+        uniqueCities
+      }
+    });
+  } catch (err) {
+    console.error("Impact Score Calculation Error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
