@@ -8,6 +8,7 @@ import eventRoutes from "./src/routes/eventRoutes.js";
 import gamificationRoutes from "./src/routes/gamificationRoutes.js";
 import ngoProfileRoutes from "./src/routes/ngoProfileRoutes.js";
 import volunteerProfileRoutes from "./src/routes/volunteerProfileRoutes.js";
+import calendarRoutes from "./src/routes/calendarRoutes.js";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/events", eventRoutes);
 app.use("/gamification", gamificationRoutes);
 app.use("/api/ngo", ngoProfileRoutes);
 app.use("/api/volunteer", volunteerProfileRoutes);
+app.use("/api/calendar", calendarRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", async (req, res) => {
@@ -50,6 +52,7 @@ app.listen(PORT, async () => {
     console.log(`🎮 Gamification routes: /events/* | /gamification/*`);
     console.log(`🏢 NGO Profile routes: /api/ngo/*`);
     console.log(`🙋 Volunteer Profile routes: /api/volunteer/*`);
+    console.log(`📅 Calendar routes: /api/calendar/*`);
 
     // Verify Supabase connection on startup
     try {

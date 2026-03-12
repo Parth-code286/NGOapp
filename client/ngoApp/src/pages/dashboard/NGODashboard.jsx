@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import DashboardOverview from './DashboardOverview';
 import CreateEvent from './CreateEvent';
+import ManageEvents from './ManageEvents';
 import BrowseVolunteers from './BrowseVolunteers';
+import NGOProfile from './NGOProfile';
 import './NGODashboard.css';
 
 // Placeholder section for unbuilt features
@@ -26,7 +28,7 @@ const NGODashboard = () => {
       case 'create-event': return <CreateEvent />;
       case 'browse-volunteers': return <BrowseVolunteers />;
       case 'manage-events':
-        return <ComingSoon title="Manage Events" />;
+        return <ManageEvents />;
       case 'attendance':
         return <ComingSoon title="Attendance Tracking" />;
       case 'visualization':
@@ -46,7 +48,7 @@ const NGODashboard = () => {
       case 'notifications':
         return <ComingSoon title="Notifications" />;
       case 'profile':
-        return <ComingSoon title="My Profile" />;
+        return <NGOProfile />;
       default:
         return <DashboardOverview />;
     }
