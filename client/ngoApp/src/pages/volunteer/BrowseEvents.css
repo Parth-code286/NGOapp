@@ -108,6 +108,29 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
+.be-card.emergency {
+  border: 2px solid #feb2b2;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+}
+
+.be-emergency-tag {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+  display: inline-block;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .be-mode-badge {
   position: absolute; top: 1rem; right: 1rem;
   padding: 0.2rem 0.625rem;

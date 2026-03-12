@@ -2,7 +2,7 @@ import supabase from '../config/supabaseClient.js';
 
 // 1. Create a new crisis (For NGOs)
 export const createCrisis = async (req, res) => {
-  const { ngo_id, title, description, required_amount } = req.body;
+  const { ngo_id, title, description, required_amount, upi_id } = req.body;
 
   if (!ngo_id || !title || !description || !required_amount) {
     return res.status(400).json({ error: 'All fields are required.' });
@@ -11,7 +11,7 @@ export const createCrisis = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('crises')
-      .insert([{ ngo_id, title, description, required_amount, collected_amount: 0, status: 'active' }])
+      .insert([{ ngo_id, title, description, required_amount, upi_id, collected_amount: 0, status: 'active' }])
       .select()
       .single();
 

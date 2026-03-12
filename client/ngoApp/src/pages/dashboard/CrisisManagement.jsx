@@ -10,6 +10,7 @@ const CrisisManagement = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [requiredAmount, setRequiredAmount] = useState('');
+  const [upiId, setUpiId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -61,7 +62,8 @@ const CrisisManagement = () => {
           ngo_id: user.id || '00000000-0000-0000-0000-000000000000', // Fallback for testing
           title,
           description,
-          required_amount: parseFloat(requiredAmount)
+          required_amount: parseFloat(requiredAmount),
+          upi_id: upiId
         })
       });
 
@@ -71,6 +73,7 @@ const CrisisManagement = () => {
         setTitle('');
         setDescription('');
         setRequiredAmount('');
+        setUpiId('');
         fetchCrises(); // Refresh the list
       } else {
         setMessage(data.error || 'Failed to post crisis.');
@@ -132,6 +135,17 @@ const CrisisManagement = () => {
                 value={requiredAmount}
                 onChange={(e) => setRequiredAmount(e.target.value)}
                 placeholder="50000"
+                required 
+              />
+            </div>
+
+            <div className="form-group">
+              <label>UPI ID for Donations (e.g. ngo@okaxis)</label>
+              <input 
+                type="text" 
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                placeholder="ngo@upi"
                 required 
               />
             </div>

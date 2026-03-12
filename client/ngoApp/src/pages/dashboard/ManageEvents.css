@@ -160,6 +160,24 @@
   border-radius: 999px;
 }
 
+.me-emergency-tag {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+  display: inline-block;
+  animation: me-pulse-red 2s infinite;
+}
+
+@keyframes me-pulse-red {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .me-status-dot {
   font-size: 0.75rem;
   font-weight: 600;

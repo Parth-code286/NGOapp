@@ -173,12 +173,17 @@ const BrowseEvents = () => {
                 const isExpired = deadline && deadline < new Date();
 
                 return (
-                  <div className="be-card" key={ev.id}>
+                  <div className={`be-card ${ev.is_emergency ? 'emergency' : ''}`} key={ev.id}>
                     {/* Mode badge */}
                     <div className={`be-mode-badge ${ev.mode?.toLowerCase()}`}>{ev.mode}</div>
 
                     <div className="be-card-body">
-                      <div className="be-category-tag">{ev.category}</div>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <div className="be-category-tag">{ev.category}</div>
+                        {ev.is_emergency && (
+                          <div className="be-emergency-tag">🚨 URGENT</div>
+                        )}
+                      </div>
                       <h3 className="be-event-title">{ev.title}</h3>
                       <p className="be-ngo-name">🏢 {ev.ngo_name || 'Organisation'}</p>
 

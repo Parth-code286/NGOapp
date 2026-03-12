@@ -1,6 +1,7 @@
 import { eventModel } from "../models/eventModel.js";
 import { volunteerModel } from "../models/volunteerModel.js";
 import { awardPoints } from "../services/pointsService.js";
+import supabase from "../config/supabaseClient.js";
 
 // ═══════════════════════════════════════════════════════════════
 //  EVENT CRUD
@@ -10,6 +11,23 @@ import { awardPoints } from "../services/pointsService.js";
 export const createEvent = async (req, res) => {
     try {
         const event = await eventModel.create(req.body);
+
+        // If emergency, broadcast to all volunteers
+        if (req.body.is_emergency) {
+            const { data: volunteers } = await supabase.from("volunteers").select("id");
+            if (volunteers && volunteers.length > 0) {
+                const notifications = volunteers.map(v => ({
+                    user_id: v.id,
+                    title: "🚨 URGENT: Emergency Event",
+                    message: `A new emergency event has been posted: ${event.title}. Your immediate help is needed!`,
+                    type: "emergency_event",
+                    related_id: event.id,
+                    is_read: false
+                }));
+                await supabase.from("notifications").insert(notifications);
+            }
+        }
+
         return res.status(201).json({ message: "Event created.", event });
     } catch (err) {
         return res.status(500).json({ error: err.message });

@@ -4,8 +4,9 @@ CREATE TABLE crises (
   ngo_id UUID NOT NULL, -- references ngo profiles or auth users
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  required_amount DECIMAL NOT NULL,
-  collected_amount DECIMAL DEFAULT 0,
+  required_amount DECIMAL(12,2) NOT NULL,
+  collected_amount DECIMAL(12,2) DEFAULT 0,
+  upi_id TEXT,
   status TEXT DEFAULT 'active', -- 'active' or 'resolved'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
