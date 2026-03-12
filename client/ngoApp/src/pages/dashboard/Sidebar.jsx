@@ -10,9 +10,9 @@ import {
 
 const navItems = [
   { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'create-event', label: 'Create Event', icon: PlusCircle },
-  { id: 'manage-events', label: 'Manage Events', icon: ClipboardList },
-  { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
+  // { id: 'create-event', label: 'Create Event', icon: PlusCircle },
+  // { id: 'manage-events', label: 'Manage Events', icon: ClipboardList },
+  // { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
   { id: 'attendance', label: 'Attendance Tracking', icon: UserCheck, url: 'https://ngo-attendance.vercel.app' },
   { id: 'visualization', label: 'Event Visualization', icon: BarChart2 },
   { id: 'chat', label: 'Chat Section', icon: MessageSquare, route: '/chat' },
