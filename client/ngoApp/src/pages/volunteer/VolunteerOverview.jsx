@@ -73,27 +73,10 @@ const VolunteerOverview = ({ onSectionChange }) => {
         attended: a.verified
       })) || [];
 
-      // 5. Fetch Certificates (Wrapped in try-catch to handle 404 if table missing)
-      let certCount = 0;
-      try {
-        const { count, error: certError } = await supabase
-          .from('certificates')
-          .select('*', { count: 'exact', head: true })
-          .eq('volunteer_id', user.id);
-        
-        if (!certError) certCount = count || 0;
-        else if (certError.code === 'PGRST116' || certError.message.includes('not found')) {
-            console.warn('Certificates table not found. Defaulting to 0.');
-        }
-      } catch (e) {
-        console.warn('Certificates table missing:', e);
-      }
-
       setStats([
         { label: 'Events Registered',   value: registeredCount, icon: '📋', color: 'stat-blue' },
         { label: 'Events Attended',     value: volProfile?.events_attended || 0, icon: '✅', color: 'stat-green' },
         { label: 'Hours Volunteered',   value: (volProfile?.events_attended || 0) * 4, icon: '⏱️', color: 'stat-yellow' },
-        { label: 'Certificates Earned', value: certCount || 0, icon: '🎓', color: 'stat-purple' },
         { label: 'Impact Points',       value: volProfile?.points.toLocaleString() || 0, icon: '🏆', color: 'stat-orange' },
         { label: 'Leaderboard Rank',    value: `#${rank}`, icon: '🥇', color: 'stat-teal' },
       ]);
@@ -117,7 +100,6 @@ const VolunteerOverview = ({ onSectionChange }) => {
       .on('postgres_changes', { event: '*', table: 'volunteers', filter: `id=eq.${user.id}` }, () => fetchVolunteerData())
       .on('postgres_changes', { event: '*', table: 'event_registrations', filter: `volunteer_id=eq.${user.id}` }, () => fetchVolunteerData())
       .on('postgres_changes', { event: '*', table: 'attendance', filter: `volunteer_id=eq.${user.id}` }, () => fetchVolunteerData())
-      .on('postgres_changes', { event: '*', table: 'certificates', filter: `volunteer_id=eq.${user.id}` }, () => fetchVolunteerData())
       .subscribe();
 
     return () => {
@@ -131,13 +113,7 @@ const VolunteerOverview = ({ onSectionChange }) => {
     <div className="overview-container">
       <div className="overview-header">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-            <h1 className="overview-title" style={{ margin: 0 }}>Hi, <span className="text-vol">{user.name || 'Volunteer'}</span> 👋</h1>
-            <div className="live-indicator">
-              <span className="ping-dot"></span>
-              LIVE IMPACT
-            </div>
-          </div>
+          <h1 className="overview-title">Hi, <span className="text-vol">{user.name || 'Volunteer'}</span> 👋</h1>
           <p className="overview-subtitle">Here's your volunteering activity and upcoming events.</p>
         </div>
         <button className="btn btn-vol browse-btn" onClick={() => onSectionChange('browse')}>

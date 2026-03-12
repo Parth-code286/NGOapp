@@ -12,7 +12,6 @@ import VolunteerNotifications from './VolunteerNotifications';
 import NGOListing from './NGOListing';
 import CheckInvites from './CheckInvites';
 import EventVisualization from './EventVisualization';
-import Certificates from './Certificates';
 import VolunteerCrises from './VolunteerCrises';
 import '../dashboard/NGODashboard.css';
 
@@ -38,7 +37,6 @@ const VolunteerDashboard = () => {
       case 'registered':     return <RegisteredEvents />;
       case 'invites':        return <CheckInvites />;
       case 'ngo-listing':    return <NGOListing />;
-      case 'certificates':   return <Certificates />;
       case 'visualization':  return <EventVisualization />;
       case 'community':      return <Community />;
       case 'leaderboard':    return <Leaderboard />;
