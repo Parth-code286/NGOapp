@@ -1,0 +1,379 @@
+/* ═══════════════════════════════════════════════════════════
+   HEATMAP ANALYTICS PAGE
+   ═══════════════════════════════════════════════════════════ */
+
+.hm-wrapper {
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+  min-height: 100%;
+  padding: 2.5rem;
+  color: #1e293b;
+  position: relative;
+}
+
+[data-theme='dark'] .hm-wrapper {
+  background: linear-gradient(145deg, #0f0c29 0%, #1a1140 40%, #24243e 100%);
+  color: #e2e8f0;
+}
+
+/* ─── Header ─── */
+.hm-header {
+  margin-bottom: 2rem;
+}
+
+.hm-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+[data-theme='dark'] .hm-title {
+  background: linear-gradient(135deg, #fcba03 0%, #ff6b6b 50%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hm-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  max-width: 600px;
+}
+
+[data-theme='dark'] .hm-subtitle {
+  color: #94a3b8;
+}
+
+/* ─── Loading ─── */
+.hm-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 6rem 2rem;
+  color: #64748b;
+}
+
+[data-theme='dark'] .hm-loading {
+  color: #94a3b8;
+}
+
+.hm-spin {
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(16, 185, 129, 0.2);
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: hm-spinner 0.7s linear infinite;
+}
+
+@keyframes hm-spinner {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Stats Overview ─── */
+.hm-overview-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.hm-overview-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  flex: 1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+[data-theme='dark'] .hm-overview-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(16px);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.hm-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.hm-card-content h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  margin: 0 0 0.25rem 0;
+}
+
+[data-theme='dark'] .hm-card-content h3 {
+  color: #94a3b8;
+}
+
+.hm-card-content p {
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0;
+  color: #0f172a;
+}
+
+[data-theme='dark'] .hm-card-content p {
+  color: white;
+}
+
+/* ─── Legend ─── */
+.hm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme='dark'] .hm-legend {
+  background: rgba(0,0,0,0.2);
+  border-color: rgba(255,255,255,0.05);
+}
+
+.hm-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+[data-theme='dark'] .hm-legend-item {
+  color: #cbd5e1;
+}
+
+.hm-legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+/* ─── Map Container ─── */
+.hm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ─── Region Card ─── */
+.hm-region-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-theme='dark'] .hm-region-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.hm-region-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 35px -5px rgba(0,0,0,0.1);
+}
+
+[data-theme='dark'] .hm-region-card:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  background: rgba(255,255,255,0.05);
+}
+
+.hm-region-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+[data-theme='dark'] .hm-region-header {
+  border-bottom-color: rgba(255,255,255,0.1);
+}
+
+.hm-region-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+[data-theme='dark'] .hm-region-name {
+  color: white;
+}
+
+.hm-region-total {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .hm-region-total {
+  background: rgba(255,255,255,0.1);
+  color: #e2e8f0;
+}
+
+/* ─── Waffle Chart (The Heatmap Visual) ─── */
+.hm-waffle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.hm-waffle-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  opacity: 0.9;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+
+.hm-waffle-dot:hover {
+  transform: scale(1.3);
+  z-index: 2;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+[data-theme='dark'] .hm-waffle-dot {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+}
+
+/* Tooltip for dots */
+.hm-waffle-dot::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background: #1e293b;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 10;
+  font-weight: 600;
+}
+
+.hm-waffle-dot:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* ─── Region Breakdown List ─── */
+.hm-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.hm-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hm-breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .hm-breakdown-label {
+  color: #cbd5e1;
+}
+
+.hm-breakdown-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  margin: 0 1rem;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .hm-breakdown-bar-wrap {
+  background: rgba(255,255,255,0.05);
+}
+
+.hm-breakdown-bar {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.hm-breakdown-value {
+  font-weight: 800;
+  color: #1e293b;
+  width: 24px;
+  text-align: right;
+}
+
+[data-theme='dark'] .hm-breakdown-value {
+  color: white;
+}
+
+/* ─── Empty state ─── */
+.hm-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255,255,255,0.02);
+  border: 2px dashed rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  color: #64748b;
+  grid-column: 1 / -1;
+}
+
+/* Categories Colors */
+.cat-color-health      { background-color: #ef4444; color: #ef4444; } /* Red */
+.cat-color-cleanliness { background-color: #3b82f6; color: #3b82f6; } /* Blue */
+.cat-color-food        { background-color: #f59e0b; color: #f59e0b; } /* Orange */
+.cat-color-education   { background-color: #8b5cf6; color: #8b5cf6; } /* Purple */
+.cat-color-environment { background-color: #10b981; color: #10b981; } /* Green */
+.cat-color-animal      { background-color: #ec4899; color: #ec4899; } /* Pink */
+.cat-color-tech        { background-color: #06b6d4; color: #06b6d4; } /* Cyan */
+.cat-color-default     { background-color: #94a3b8; color: #94a3b8; } /* Slate */

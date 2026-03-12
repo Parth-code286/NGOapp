@@ -1,0 +1,120 @@
+/* ─── Event Detail Modal ─── */
+.edm-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 2rem;
+}
+
+.edm-modal {
+  background-color: var(--bg-pure, #ffffff);
+  border-radius: 24px;
+  width: 100%; max-width: 650px;
+  max-height: 90vh;
+  display: flex; flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.edm-close {
+  position: absolute; top: 1.25rem; right: 1.25rem;
+  background: var(--bg-off, #f8fafc); border: none;
+  width: 32px; height: 32px; border-radius: 50%;
+  font-size: 1rem; color: var(--text-muted, #64748b);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; z-index: 10;
+}
+.edm-close:hover { background: #fee2e2; color: #b91c1c; }
+
+/* Header */
+.edm-header {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
+}
+.edm-mode {
+  display: inline-block; padding: 0.2rem 0.6rem;
+  border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.edm-mode.offline { background-color: #fef0c7; color: var(--primary-dark, #0369a1); }
+.edm-mode.online  { background-color: #dcfce7; color: #15803d; }
+.edm-mode.hybrid  { background-color: #ede9fe; color: #6d28d9; }
+
+.edm-category {
+  font-size: 0.8rem; font-weight: 700; color: var(--primary, #0ea5e9);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.edm-title { margin: 0.5rem 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main, #0f172a); }
+.edm-ngo { font-size: 0.9rem; color: var(--text-muted, #64748b); font-weight: 500; }
+
+/* Body */
+.edm-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+.edm-description {
+  font-size: 0.95rem; color: var(--text-muted, #64748b);
+  line-height: 1.6; margin-bottom: 2rem;
+}
+
+.edm-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+.edm-section h3 {
+  font-size: 0.9rem; font-weight: 700; color: var(--text-main, #0f172a);
+  margin-bottom: 0.75rem; border-bottom: 2px solid var(--bg-off, #f8fafc);
+  padding-bottom: 0.4rem;
+}
+
+.edm-row {
+  display: flex; justify-content: space-between;
+  font-size: 0.85rem; padding: 0.35rem 0; gap: 1rem;
+}
+.edm-row span:first-child { color: var(--text-muted, #64748b); font-weight: 500; }
+.edm-row span:last-child  { color: var(--text-main, #0f172a); font-weight: 600; text-align: right; }
+
+.edm-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.edm-skill-tag {
+  background: var(--bg-off, #f8fafc); border: 1px solid var(--border-light, #e2e8f0);
+  padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+  color: var(--text-muted, #64748b);
+}
+
+.edm-perks { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.edm-perk-tag {
+  padding: 0.2rem 0.5rem;
+  background-color: #f0fdf4; color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+}
+
+/* Footer */
+.edm-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border-light, #e2e8f0);
+  background: var(--bg-off, #f8fafc);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+
+.edm-slots { font-size: 0.85rem; font-weight: 600; color: var(--text-muted, #64748b); }
+.edm-slots .deadline.expired { color: #dc2626; }
+
+.edm-actions { display: flex; gap: 0.75rem; }
+.edm-btn-secondary {
+  padding: 0.6rem 1.25rem; border: 1.5px solid var(--border-light, #e2e8f0);
+  background: white; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+  color: var(--text-main, #0f172a); cursor: pointer; transition: all 0.2s;
+}
+.edm-btn-secondary:hover { background: var(--bg-off, #f8fafc); }
+
+@media (max-width: 600px) {
+  .edm-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .edm-header { padding: 1.5rem 1.5rem 1rem; }
+  .edm-body { padding: 1.25rem 1.5rem; }
+  .edm-footer { flex-direction: column; align-items: flex-start; padding: 1.25rem 1.5rem; }
+  .edm-actions { width: 100%; display: grid; grid-template-columns: 1fr 2fr; }
+}

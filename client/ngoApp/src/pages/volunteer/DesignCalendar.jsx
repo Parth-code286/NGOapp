@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './DesignCalendar.css';
 
-// Dummy registered events data mapped by date string "YYYY-MM-DD"
-const DUMMY_EVENTS = {
-  '2026-03-14': { name: 'Tree Plantation Drive', org: 'GreenEarth NGO', time: '9:00 AM' },
-  '2026-03-18': { name: 'Blood Donation Camp', org: 'HealthFirst', time: '10:00 AM' },
-  '2026-04-05': { name: 'Digital Literacy Campaign', org: 'EduReach', time: '11:00 AM' },
-  '2026-04-20': { name: 'Food Distribution Drive', org: 'FoodFirst', time: '8:00 AM' },
-};
+const API_BASE = 'http://localhost:5053';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -24,8 +18,11 @@ const toKey = (year, month, day) => {
 };
 
 const DesignCalendar = () => {
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = localStorage.getItem('token');
+  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+
   const startYear  = today.getFullYear();
-  // Show 3 years worth of months (current year + 2)
   const allMonths  = [];
   for (let y = startYear; y <= startYear + 2; y++) {
     for (let m = 0; m < 12; m++) {
@@ -33,31 +30,83 @@ const DesignCalendar = () => {
     }
   }
 
-  // availability state: key  => 'available' | 'busy'
+  // availability state: key => 'available' | 'busy'
   const [availability, setAvailability] = useState({});
-  // reason state: key => string
   const [reasons, setReasons]           = useState({});
-  // reason input open: key => bool
   const [reasonOpen, setReasonOpen]     = useState({});
+  const [events, setEvents]             = useState({});
+  const [loading, setLoading]           = useState(true);
+
+  // ── Load data from backend ──
+  const fetchData = useCallback(async () => {
+    if (!user.id) { setLoading(false); return; }
+    try {
+      const res  = await fetch(`${API_BASE}/api/calendar/${user.id}`, { headers });
+      const data = await res.json();
+      if (res.ok) {
+        // Build availability map from backend entries
+        const avail = {};
+        const reas  = {};
+        for (const entry of (data.availability || [])) {
+          avail[entry.date] = entry.status;
+          if (entry.reason) reas[entry.date] = entry.reason;
+        }
+        setAvailability(avail);
+        setReasons(reas);
+        setEvents(data.events || {});
+      }
+    } catch {}
+    setLoading(false);
+  }, [user.id]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const getStatus = (key) => availability[key] || 'available';
 
-  const toggleStatus = (key) => {
+  const toggleStatus = async (key) => {
     const curr = getStatus(key);
     const next = curr === 'available' ? 'busy' : 'available';
+
+    // Optimistic update
     setAvailability(prev => ({ ...prev, [key]: next }));
+
     if (next === 'available') {
       setReasonOpen(prev => ({ ...prev, [key]: false }));
       setReasons(prev => { const r = { ...prev }; delete r[key]; return r; });
+      // Persist to backend
+      try {
+        await fetch(`${API_BASE}/api/calendar/${user.id}/date`, {
+          method: 'PUT', headers,
+          body: JSON.stringify({ date: key, status: 'available' }),
+        });
+      } catch {}
     } else {
       setReasonOpen(prev => ({ ...prev, [key]: true }));
     }
   };
 
-  const saveReason = (key, val) => {
+  const saveReason = async (key, val) => {
     setReasons(prev => ({ ...prev, [key]: val }));
     setReasonOpen(prev => ({ ...prev, [key]: false }));
+    // Persist busy status + reason to backend
+    try {
+      await fetch(`${API_BASE}/api/calendar/${user.id}/date`, {
+        method: 'PUT', headers,
+        body: JSON.stringify({ date: key, status: 'busy', reason: val || null }),
+      });
+    } catch {}
   };
+
+  if (loading) {
+    return (
+      <div className="cal-wrapper">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6rem 2rem', color: 'var(--text-muted)' }}>
+          <div style={{ width: 36, height: 36, border: '3px solid var(--border-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+          <p style={{ marginTop: '1rem' }}>Loading calendar…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="cal-wrapper">
@@ -95,7 +144,7 @@ const DesignCalendar = () => {
 
                 {days.map(day => {
                   const key       = toKey(year, month, day);
-                  const event     = DUMMY_EVENTS[key];
+                  const event     = events[key];
                   const status    = getStatus(key);
                   const isToday   = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
                   const isPast    = new Date(year, month, day) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -105,8 +154,8 @@ const DesignCalendar = () => {
                       <div className="cal-cell cal-event" key={key}>
                         <div className="cal-day-num event-day">{day}</div>
                         <div className="cal-event-name">{event.name}</div>
-                        <div className="cal-event-org">{event.org}</div>
-                        <div className="cal-event-time">🕐 {event.time}</div>
+                        {event.category && <div className="cal-event-org">{event.category}</div>}
+                        {event.time && <div className="cal-event-time">🕐 {event.time}</div>}
                       </div>
                     );
                   }
@@ -135,6 +184,11 @@ const DesignCalendar = () => {
                           onCancel={() => {
                             setAvailability(prev => ({ ...prev, [key]: 'available' }));
                             setReasonOpen(prev => ({ ...prev, [key]: false }));
+                            // revert on backend too
+                            fetch(`${API_BASE}/api/calendar/${user.id}/date`, {
+                              method: 'PUT', headers,
+                              body: JSON.stringify({ date: key, status: 'available' }),
+                            }).catch(() => {});
                           }}
                         />
                       )}

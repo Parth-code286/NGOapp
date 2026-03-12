@@ -21,6 +21,25 @@ const navItems = [
 const Sidebar = ({ activeSection, onSectionChange }) => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (user.id) {
+      const fetchUnread = async () => {
+        try {
+          const res = await fetch(`http://localhost:5053/api/notifications/${user.id}`);
+          const data = await res.json();
+          if (res.ok) {
+            const count = (data.notifications || []).filter(n => !n.is_read).length;
+            setUnreadCount(count);
+          }
+        } catch (err) { console.error(err); }
+      };
+      fetchUnread();
+      const interval = setInterval(fetchUnread, 30000); // 30s poll
+      return () => clearInterval(interval);
+    }
+  }, [user.id]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -44,8 +63,8 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
           >
             <span className="sidebar-icon">{item.icon}</span>
             <span className="sidebar-label">{item.label}</span>
-            {item.id === 'notifications' && (
-              <span className="notif-badge">3</span>
+            {item.id === 'notifications' && unreadCount > 0 && (
+              <span className="notif-badge">{unreadCount}</span>
             )}
           </button>
         ))}

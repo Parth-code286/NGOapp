@@ -1,0 +1,203 @@
+import supabase from "../config/supabaseClient.js";
+
+// Memory cache to prevent hitting openstreetmap rate limits for the same city repeatedly
+const geoCache = {};
+
+async function geocodeLocation(city, state, country) {
+  const query = `${city}, ${state || ''}, ${country || 'India'}`.trim();
+  if (geoCache[query]) return geoCache[query];
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'http://localhost:5053/'
+      }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const coords = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        geoCache[query] = coords;
+        return coords;
+      }
+    }
+  } catch (err) {
+    console.error(`Geocoding HTTP failed for ${query} - ${err.message}`);
+  }
+
+  return null;
+}
+
+// GET /api/analytics/volunteer-heatmap
+// Supports query params: ?days=30 (registered in last N days) & ?eventId=UUID (only attendees of specific event)
+export const getVolunteerHeatmap = async (req, res) => {
+  try {
+    const { days, eventId } = req.query;
+
+    let volunteers = [];
+
+    if (eventId) {
+      // Filter 2: Exact Event Attendees (Heatmap of where attendees came from)
+      const { data, error } = await supabase
+        .from("event_registrations")
+        .select(`
+          volunteers (
+            city, state, pincode, interests
+          )
+        `)
+        .eq("event_id", eventId)
+        .eq("status", "approved"); // Only count approved attendees
+
+      if (error) throw error;
+      // Flatten the joined data
+      volunteers = data.map(reg => reg.volunteers).filter(Boolean);
+
+    } else {
+      // Base query: attempt to fetch with lat/lng
+      let queryUrl = "city, state, pincode, country, interests, created_at, lat, lng";
+      let queryFn = (qUrl) => {
+        let q = supabase.from("volunteers").select(qUrl);
+        if (days && !isNaN(days)) {
+          const dateLimit = new Date();
+          dateLimit.setDate(dateLimit.getDate() - parseInt(days));
+          q = q.gte("created_at", dateLimit.toISOString());
+        }
+        return q;
+      };
+
+      let { data, error } = await queryFn(queryUrl);
+
+      // If lat/lng columns don't exist yet, fallback to query without them
+      if (error && error.message && error.message.includes("does not exist")) {
+        console.log("lat/lng columns not found in Supabase. Falling back to pure geocoding.");
+        queryUrl = "city, state, pincode, country, interests, created_at";
+        const fallback = await queryFn(queryUrl);
+        data = fallback.data;
+        error = fallback.error;
+      }
+      
+      if (error) throw error;
+      volunteers = data;
+    }
+
+    // Grouping by City
+    const locationMap = {};
+
+    volunteers.forEach((vol) => {
+      let loc = vol.city ? vol.city.trim() : (vol.state ? vol.state.trim() : "Unknown");
+      if (!loc) loc = "Unknown";
+      
+      loc = loc.charAt(0).toUpperCase() + loc.slice(1).toLowerCase();
+
+      if (!locationMap[loc]) {
+        locationMap[loc] = { location: loc, categories: {}, total: 0 };
+      }
+      locationMap[loc].total += 1;
+
+      // Process interests
+      if (vol.interests) {
+        const interestsList = vol.interests.split(",").map(i => i.trim().toLowerCase());
+        interestsList.forEach(interest => {
+          if (!interest) return;
+          if (!locationMap[loc].categories[interest]) locationMap[loc].categories[interest] = 0;
+          locationMap[loc].categories[interest] += 1;
+        });
+      }
+    });
+
+    // Resolve Lat/Lng for each location group
+    const heatmapData = Object.values(locationMap).sort((a, b) => b.total - a.total);
+    
+    // Attempt to geocode each group (if not already cached)
+    for (const group of heatmapData) {
+      if (group.location !== "Unknown") {
+        // Find a representative volunteer for this group to get state/country
+        const rep = volunteers.find(v => (v.city && v.city.toLowerCase() === group.location.toLowerCase()) || (v.state && v.state.toLowerCase() === group.location.toLowerCase()));
+        
+        // If the volunteer already had exact GPS from mobile/browser, use that!
+        if (rep && rep.lat && rep.lng) {
+           group.lat = rep.lat;
+           group.lng = rep.lng;
+        } else if (rep) {
+           // Fallback to geocoding the city name
+           const coords = await geocodeLocation(group.location, rep.state, rep.country);
+           if (coords) {
+             group.lat = coords.lat;
+             group.lng = coords.lng;
+           }
+        }
+      }
+    }
+
+    res.status(200).json({ heatmap: heatmapData });
+  } catch (err) {
+    console.error("Heatmap Analytics Error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/analytics/stats
+// Returns advanced global statistics across the platform
+export const getAdvancedStats = async (req, res) => {
+  try {
+    // 1. Total Volunteers
+    const { count: totalVolunteers, error: volError } = await supabase
+      .from("volunteers")
+      .select("*", { count: 'exact', head: true });
+    if (volError) throw volError;
+
+    // 2. Active Events (Total events organized)
+    const { count: totalEvents, error: evError } = await supabase
+      .from("events")
+      .select("*", { count: 'exact', head: true });
+    if (evError) throw evError;
+
+    // 3. Overall Attendance Rate
+    // Count total registrations vs approved/attended registrations
+    const { count: totalRegistrations, error: regError } = await supabase
+      .from("event_registrations")
+      .select("*", { count: 'exact', head: true });
+    
+    const { count: approvedRegistrations, error: appError } = await supabase
+      .from("event_registrations")
+      .select("*", { count: 'exact', head: true })
+      .eq("status", "approved");
+
+    const attendanceRate = totalRegistrations > 0 
+      ? Math.round((approvedRegistrations / totalRegistrations) * 100) 
+      : 0;
+
+    // 4. Top Active City
+    const { data: cityData, error: cityError } = await supabase
+      .from("volunteers")
+      .select("city");
+    
+    let topCity = "Unknown";
+    if (cityData && cityData.length > 0) {
+      const cityCounts = {};
+      cityData.forEach(v => {
+        if (v.city) {
+          const c = v.city.trim().toUpperCase();
+          cityCounts[c] = (cityCounts[c] || 0) + 1;
+        }
+      });
+      const sortedCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]);
+      if (sortedCities.length > 0) {
+         topCity = sortedCities[0][0].charAt(0) + sortedCities[0][0].slice(1).toLowerCase();
+      }
+    }
+
+    res.status(200).json({
+      totalVolunteers: totalVolunteers || 0,
+      totalEvents: totalEvents || 0,
+      attendanceRate: `${attendanceRate}%`,
+      topCity
+    });
+  } catch (err) {
+    console.error("Advanced Stats Error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+};

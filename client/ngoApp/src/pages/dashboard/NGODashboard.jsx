@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import DashboardOverview from './DashboardOverview';
 import CreateEvent from './CreateEvent';
+import ManageEvents from './ManageEvents';
 import BrowseVolunteers from './BrowseVolunteers';
+import NGOProfile from './NGOProfile';
+import AnalyticsHeatmap from './AnalyticsHeatmap';
+import VolunteerNotifications from '../volunteer/VolunteerNotifications';
+import EventVisualization from '../volunteer/EventVisualization';
+import VolunteerParticipation from './VolunteerParticipation';
 import './NGODashboard.css';
 
 // Placeholder section for unbuilt features
@@ -26,17 +32,19 @@ const NGODashboard = () => {
       case 'create-event': return <CreateEvent />;
       case 'browse-volunteers': return <BrowseVolunteers />;
       case 'manage-events':
-        return <ComingSoon title="Manage Events" />;
+        return <ManageEvents />;
       case 'attendance':
         return <ComingSoon title="Attendance Tracking" />;
       case 'visualization':
-        return <ComingSoon title="Event Visualization" />;
+        return <EventVisualization />;
       case 'chat':
         return <ComingSoon title="Chat Section" />;
       case 'volunteers':
-        return <ComingSoon title="Volunteer Participation Tracking" />;
+        return <VolunteerParticipation />;
       case 'analytics':
         return <ComingSoon title="Impact Analytical Dashboard" />;
+      case 'heatmap':
+        return <AnalyticsHeatmap />;
       case 'impact-score':
         return <ComingSoon title="Community Impact Score" />;
       case 'certificates':
@@ -44,9 +52,9 @@ const NGODashboard = () => {
       case 'heatmap':
         return <ComingSoon title="Category Heat Map" />;
       case 'notifications':
-        return <ComingSoon title="Notifications" />;
+        return <VolunteerNotifications />;
       case 'profile':
-        return <ComingSoon title="My Profile" />;
+        return <NGOProfile />;
       default:
         return <DashboardOverview />;
     }

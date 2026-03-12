@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import EventDetailModal from '../../components/EventDetailModal';
 import './BrowseEvents.css';
 
 const API_BASE = 'http://localhost:5053';
@@ -15,6 +16,7 @@ const BrowseEvents = () => {
   const [search,     setSearch]     = useState('');
   const [category,   setCategory]   = useState('All');
   const [modeFilter, setModeFilter] = useState('All');
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   // Track per-event registration state  { [eventId]: 'idle' | 'loading' | 'registered' | 'error'  }
   const [regStatus,  setRegStatus]  = useState({});
@@ -204,13 +206,22 @@ const BrowseEvents = () => {
                             </span>
                           )}
                         </div>
-                        <button
-                          className={`be-reg-btn ${label.cls}`}
-                          onClick={() => handleRegister(ev.id)}
-                          disabled={isDisabled(ev) || isExpired}
-                        >
-                          {label.text}
-                        </button>
+                        <div className="be-actions" style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+                          <button 
+                            className="be-view-btn" 
+                            style={{ padding: '0.55rem', background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer', transition: 'all 0.2s' }}
+                            onClick={() => setSelectedEvent(ev)}
+                          >
+                            👁 Details
+                          </button>
+                          <button
+                            className={`be-reg-btn ${label.cls}`}
+                            onClick={() => handleRegister(ev.id)}
+                            disabled={isDisabled(ev) || isExpired}
+                          >
+                            {label.text}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -219,6 +230,26 @@ const BrowseEvents = () => {
             </div>
           )}
         </>
+      )}
+
+      {selectedEvent && (
+        <EventDetailModal
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          actionButton={
+            <button
+              className={`be-reg-btn ${getRegLabel(selectedEvent).cls}`}
+              style={{ padding: '0.7rem 1.5rem', borderRadius: '12px' }}
+              onClick={() => {
+                handleRegister(selectedEvent.id);
+                // Keep modal open so they see it register
+              }}
+              disabled={isDisabled(selectedEvent) || (selectedEvent.registration_deadline && new Date(selectedEvent.registration_deadline) < new Date())}
+            >
+              {getRegLabel(selectedEvent).text}
+            </button>
+          }
+        />
       )}
     </div>
   );
