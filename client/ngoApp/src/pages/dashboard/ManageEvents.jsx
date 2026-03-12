@@ -313,7 +313,45 @@ const ManageEvents = () => {
 // ─────────────────────────────────────────────────────────────
 //  EventDetailModal — popup card with event info, roles & regs
 // ─────────────────────────────────────────────────────────────
-const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, onDeleteRole }) => (
+const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, onDeleteRole }) => {
+  const [selectedVols, setSelectedVols] = useState([]);
+  const [payoutAmount, setPayoutAmount] = useState('100');
+  const [paying, setPaying] = useState(false);
+
+  const toggleVol = (id) => {
+    setSelectedVols(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
+  };
+
+  const handlePayout = async () => {
+    if (selectedVols.length === 0) return alert('Select at least one volunteer to pay');
+    if (!payoutAmount || parseFloat(payoutAmount) <= 0) return alert('Enter a valid amount');
+    
+    setPaying(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/payments/payout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          eventId: ev.id,
+          volunteerIds: selectedVols,
+          amountPerVolunteer: parseFloat(payoutAmount)
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setSelectedVols([]);
+      } else {
+        alert('Payout failed: ' + data.error);
+      }
+    } catch (err) {
+      alert('Network error during payout');
+    }
+    setPaying(false);
+  };
+
+  return (
   <div className="me-modal-overlay" onClick={onClose}>
     <div className="me-modal detail-modal" onClick={e => e.stopPropagation()}>
       <button className="me-modal-close" onClick={onClose}>✕</button>
@@ -413,11 +451,31 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
           </div>
 
           <div className="me-detail-card-popup" style={{ marginTop: '1.25rem' }}>
-            <h3>📝 Registrations ({registrations.length})</h3>
-            <div className="me-table-wrap-popup">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>📝 Registrations & Payouts ({registrations.length})</h3>
+              {selectedVols.length > 0 && (
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>Pay ₹</span>
+                  <input 
+                    type="number" 
+                    value={payoutAmount} 
+                    onChange={e => setPayoutAmount(e.target.value)} 
+                    style={{ width: '70px', padding: '0.2rem 0.5rem', border: '1px solid #d1d5db', borderRadius: '4px' }}
+                  />
+                  <button onClick={handlePayout} disabled={paying} style={{ backgroundColor: '#059669', color: 'white', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}>
+                    {paying ? 'Paying...' : `Pay ${selectedVols.length} Volunteers`}
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="me-table-wrap-popup" style={{ marginTop: '1rem' }}>
               <table className="me-table-popup">
                 <thead>
                   <tr>
+                    <th style={{ width: '40px' }}><input type="checkbox" onChange={(e) => {
+                      if(e.target.checked) setSelectedVols(registrations.map(r => r.volunteer_id));
+                      else setSelectedVols([]);
+                    }} checked={selectedVols.length === registrations.length && registrations.length > 0} /></th>
                     <th>Volunteer</th>
                     <th>Email</th>
                     <th>City</th>
@@ -426,10 +484,13 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
                 </thead>
                 <tbody>
                   {registrations.length === 0 ? (
-                    <tr><td colSpan="4" className="me-no-data">No registrations yet.</td></tr>
+                    <tr><td colSpan="5" className="me-no-data">No registrations yet.</td></tr>
                   ) : (
                     registrations.map(reg => (
                       <tr key={reg.id}>
+                        <td>
+                          <input type="checkbox" checked={selectedVols.includes(reg.volunteer_id)} onChange={() => toggleVol(reg.volunteer_id)} />
+                        </td>
                         <td><span className="me-vol-name">{reg.volunteers?.name || '—'}</span></td>
                         <td>{reg.volunteers?.email || '—'}</td>
                         <td>{reg.volunteers?.city || '—'}</td>
@@ -453,6 +514,7 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default ManageEvents;

@@ -12,6 +12,7 @@ import VolunteerNotifications from './VolunteerNotifications';
 import CheckInvites from './CheckInvites';
 import EventVisualization from './EventVisualization';
 import VolunteerCrises from './VolunteerCrises';
+import SubscriptionTiers from './SubscriptionTiers';
 import '../dashboard/NGODashboard.css';
 
 const ComingSoon = ({ title }) => (
@@ -31,6 +32,7 @@ const VolunteerDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'overview':       return <VolunteerOverview onSectionChange={setActiveSection} />;
+      case 'subscriptions':  return <SubscriptionTiers />;
       case 'calendar':       return <DesignCalendar />;
       case 'browse':         return <BrowseEvents />;
       case 'registered':     return <RegisteredEvents />;

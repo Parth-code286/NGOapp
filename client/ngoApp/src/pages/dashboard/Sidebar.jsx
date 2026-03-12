@@ -5,11 +5,12 @@ import './Sidebar.css';
 import {
   LayoutDashboard, PlusCircle, ClipboardList, Search, UserCheck,
   BarChart2, MessageSquare, Users, AlertTriangle, PieChart,
-  Award, FileBadge, Map, Bell, User, LogOut
+  Award, FileBadge, Map, Bell, User, LogOut, IndianRupee
 } from 'lucide-react';
 
 const navItems = [
   { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'wallet', label: 'NGO Wallet', icon: IndianRupee },
   // { id: 'create-event', label: 'Create Event', icon: PlusCircle },
   // { id: 'manage-events', label: 'Manage Events', icon: ClipboardList },
   // { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
@@ -22,7 +23,6 @@ const navItems = [
   { id: 'impact-score', label: 'Community Impact Score', icon: Award },
   { id: 'heatmap', label: 'Category Heat Map', icon: Map },
   { id: 'notifications', label: 'Notifications', icon: Bell },
-  
 ];
 
 const Sidebar = ({ activeSection, onSectionChange }) => {
