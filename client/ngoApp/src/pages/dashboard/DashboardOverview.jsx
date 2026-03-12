@@ -10,7 +10,7 @@ const DashboardOverview = ({ onSectionChange }) => {
     { label: 'Active Participation', value: '0', icon: '👥', color: 'stat-green' },
     { label: 'Attendance Rate', value: '0%', icon: '✅', color: 'stat-purple' },
     { label: 'Impact Score', value: '0', icon: '🏆', color: 'stat-orange' },
-    { label: 'Certificates Sync', value: 'Live', icon: '🎓', color: 'stat-teal' },
+    { label: 'Pending Approvals', value: '0', icon: '⏳', color: 'stat-teal' },
   ]);
   const [recentEvents, setRecentEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +39,7 @@ const DashboardOverview = ({ onSectionChange }) => {
 
       const uniqueVols = new Set(registrations?.map(r => r.volunteer_id)).size;
       const activeParticipation = registrations?.filter(r => r.status === 'approved').length;
+      const pendingApprovals = registrations?.filter(r => r.status === 'pending' || !r.status).length;
 
       // 4. Attendance Rate
       const { data: attendanceData } = await supabase
@@ -53,10 +54,10 @@ const DashboardOverview = ({ onSectionChange }) => {
       setStats([
         { label: 'Events Posted', value: eventCount || 0, icon: '📅', color: 'stat-yellow' },
         { label: 'Total Volunteers', value: uniqueVols || 0, icon: '🤝', color: 'stat-blue' },
-        { label: 'Active Participation', value: activeParticipation || 0, icon: '👥', color: 'stat-green' },
+        { label: 'Active Participants', value: activeParticipation || 0, icon: '👥', color: 'stat-green' },
         { label: 'Attendance Rate', value: `${attendRate}%`, icon: '✅', color: 'stat-purple' },
         { label: 'Impact Score', value: (activeParticipation * 50) + (eventCount * 100), icon: '🏆', color: 'stat-orange' },
-        { label: 'Certificates Sync', value: 'Active', icon: '🎓', color: 'stat-teal' },
+        { label: 'Pending Approvals', value: pendingApprovals || 0, icon: '⏳', color: 'stat-teal' },
       ]);
 
       setRecentEvents(eventsData?.map(ev => ({
