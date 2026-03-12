@@ -70,7 +70,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ["tslib"],
+      // external: ["tslib"], // Removed so tslib is bundled instead of left as a bare import
     },
   },
 });
