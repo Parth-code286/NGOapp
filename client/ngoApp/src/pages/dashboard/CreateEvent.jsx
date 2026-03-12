@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './CreateEvent.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 const SKILLS = ['Teaching', 'Medical Support', 'Social Media', 'Logistics', 'Crowd Management', 'Photography', 'Cooking', 'Counseling', 'Construction', 'IT Support'];
 
 const defaultRole = { roleName: '', roleDescription: '', volunteers: '' };

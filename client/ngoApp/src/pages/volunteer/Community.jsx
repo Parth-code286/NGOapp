@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './Community.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 
 const LEVEL_TIERS = [
   { level: 1, name: 'Newcomer',   icon: '🌱', min: 0,    max: 199  },

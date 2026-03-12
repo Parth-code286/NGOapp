@@ -20,7 +20,7 @@ const VolunteerCrises = () => {
 
   const fetchActiveCrises = async () => {
     try {
-      const res = await fetch('http://localhost:5053/api/crises');
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/crises`);
       const data = await res.json();
       if (res.ok) {
         const sortedCrises = (data.crises || []).sort((a, b) => {
@@ -44,7 +44,7 @@ const VolunteerCrises = () => {
     setErrorMsg('');
 
     try {
-      const res = await fetch(`http://localhost:5053/api/crises/${selectedCrisis.id}/donate`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/crises/${selectedCrisis.id}/donate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

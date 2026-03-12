@@ -20,7 +20,7 @@ const CrisisManagement = () => {
 
   const fetchCrises = async () => {
     try {
-      const res = await fetch('http://localhost:5053/api/crises');
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/crises`);
       const data = await res.json();
       if (res.ok) {
         const sortedCrises = (data.crises || []).sort((a, b) => {
@@ -39,7 +39,7 @@ const CrisisManagement = () => {
 
   const handleCloseCrisis = async (crisisId) => {
     try {
-      const res = await fetch(`http://localhost:5053/api/crises/${crisisId}/close`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/crises/${crisisId}/close`, {
         method: 'PATCH'
       });
       if (res.ok) fetchCrises();
@@ -54,7 +54,7 @@ const CrisisManagement = () => {
     setMessage('');
 
     try {
-      const res = await fetch('http://localhost:5053/api/crises', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/crises`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

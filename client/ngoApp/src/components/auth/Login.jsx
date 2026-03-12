@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Auth.css';
 
-const API_BASE = 'http://localhost:5053/api';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 const Login = ({ switchToSignup, onClose }) => {
   const [role, setRole] = useState('volunteer'); // 'volunteer' or 'ngo'

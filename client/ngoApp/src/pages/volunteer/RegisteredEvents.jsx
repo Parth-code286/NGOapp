@@ -4,7 +4,7 @@ import EventDetailModal from '../../components/EventDetailModal';
 import './BrowseEvents.css'; /* Reuse same base styles */
 import './RegisteredEvents.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 
 const STATUS_CONFIG = {
   pending:    { label: '⏳ Pending',    cls: 'status-pending'    },

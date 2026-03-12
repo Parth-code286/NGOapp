@@ -6,7 +6,7 @@ import {
 import { supabase } from '../../lib/supabaseClient';
 import './ImpactAnalytics.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 
 const COLORS = ['#fcba03', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#f97316'];
 

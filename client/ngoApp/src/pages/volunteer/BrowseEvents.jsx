@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import EventDetailModal from '../../components/EventDetailModal';
 import './BrowseEvents.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 
 const CATEGORIES = ['All', 'Environment', 'Education', 'Healthcare', 'Food Distribution', 'Disaster Relief', 'Animal Welfare', 'Community Service'];
 

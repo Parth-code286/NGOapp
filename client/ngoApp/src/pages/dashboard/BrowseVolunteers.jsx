@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './BrowseVolunteers.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 const INTERESTS = ['All', 'Environment', 'Healthcare', 'Education', 'Community Service', 'Animal Welfare', 'Disaster Relief'];
 const AVATAR_COLORS = ['#fcba03', '#3b82f6', '#22c55e', '#a855f7', '#f97316', '#14b8a6'];
 

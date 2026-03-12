@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './ManageEvents.css';
 
-const API_BASE = 'http://localhost:5053';
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}`;
 
 // ─────────────────────────────────────────────────────────────
 //  ManageEvents — list view + detail drill-down

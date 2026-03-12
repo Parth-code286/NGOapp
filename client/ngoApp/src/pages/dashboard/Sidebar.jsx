@@ -34,7 +34,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
     if (user.id) {
       const fetchUnread = async () => {
         try {
-          const res = await fetch(`http://localhost:5053/api/notifications/${user.id}`);
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/notifications/${user.id}`);
           const data = await res.json();
           if (res.ok) {
             const count = (data.notifications || []).filter(n => !n.is_read).length;
