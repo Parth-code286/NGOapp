@@ -2,20 +2,27 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../dashboard/Sidebar.css';
 
+import {
+  LayoutDashboard, CalendarRange, Search, ClipboardList, Mail,
+  Building2, FileBadge, BarChart2, Award, AlertTriangle,
+  MessageSquare, Bell, UserCheck, User, LogOut
+} from 'lucide-react';
+
 const volunteerNavItems = [
-  { id: 'overview',     label: 'Dashboard',            icon: '📊' },
-  { id: 'calendar',    label: 'Design Calendar',       icon: '📅' },
-  { id: 'browse',      label: 'Browse Events',         icon: '🔍' },
-  { id: 'registered',  label: 'Registered Events',     icon: '📋' },
-  { id: 'invites',     label: 'Check Invites',         icon: '✉️' },
-  { id: 'ngo-listing', label: 'NGO Listing',           icon: '🏢' },
-  { id: 'certificates',label: 'Certificates Earned',   icon: '🎓' },
-  { id: 'visualization',label: 'Event Visualization',  icon: '📈' },
-  { id: 'community',   label: 'Community Hub',         icon: '🤝' },
-  { id: 'leaderboard', label: 'Leaderboard',           icon: '🏆' },
-  { id: 'chat',        label: 'Chat Section',          icon: '💬', route: '/chat' },
-  { id: 'notifications',label: 'Notifications',        icon: '🔔' },
-  { id: 'attendance',  label: 'Attendance Section',    icon: '✅', url: 'https://ngo-attendance.vercel.app' },
+  { id: 'overview',     label: 'Dashboard',            icon: LayoutDashboard },
+  { id: 'calendar',    label: 'Design Calendar',       icon: CalendarRange },
+  { id: 'browse',      label: 'Browse Events',         icon: Search },
+  { id: 'registered',  label: 'Registered Events',     icon: ClipboardList },
+  { id: 'invites',     label: 'Check Invites',         icon: Mail },
+  { id: 'ngo-listing', label: 'NGO Listing',           icon: Building2 },
+  { id: 'certificates',label: 'Certificates Earned',   icon: FileBadge },
+  { id: 'visualization',label: 'Event Visualization',  icon: BarChart2 },
+  { id: 'community',   label: 'Community Hub',         icon: Award },
+  { id: 'leaderboard', label: 'Leaderboard',           icon: Award },
+  { id: 'crises', label: 'Emergency Donations', icon: AlertTriangle },
+  { id: 'chat',        label: 'Chat Section',          icon: MessageSquare, route: '/chat' },
+  { id: 'notifications',label: 'Notifications',        icon: Bell },
+  { id: 'attendance',  label: 'Attendance Section',    icon: UserCheck, url: 'https://ngo-attendance.vercel.app' },
 ];
 
 const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
@@ -69,7 +76,7 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
               }
             }}
           >
-            <span className="sidebar-icon">{item.icon}</span>
+            <span className="sidebar-icon"><item.icon size={20} strokeWidth={2.5} /></span>
             <span className="sidebar-label">{item.label}</span>
             {item.id === 'notifications' && unreadCount > 0 && (
               <span className="notif-badge">{unreadCount}</span>
@@ -87,7 +94,7 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
           className={`sidebar-item ${activeSection === 'profile' ? 'active' : ''}`}
           onClick={() => onSectionChange('profile')}
         >
-          <span className="sidebar-icon">👤</span>
+          <span className="sidebar-icon"><User size={20} strokeWidth={2.5} /></span>
           <span className="sidebar-label">My Profile</span>
         </button>
 
@@ -102,7 +109,7 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
         </div>
 
         <button className="sidebar-item logout-btn" onClick={handleLogout}>
-          <span className="sidebar-icon">🚪</span>
+          <span className="sidebar-icon"><LogOut size={20} strokeWidth={2.5} /></span>
           <span className="sidebar-label">Logout</span>
         </button>
       </div>

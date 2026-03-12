@@ -13,6 +13,9 @@ import analyticsRoutes from "./src/routes/analyticsRoutes.js";
 import notificationRoutes from "./src/routes/notificationRoutes.js";
 import inviteRoutes from "./src/routes/inviteRoutes.js";
 import participationRoutes from "./src/routes/participationRoutes.js";
+import certificateRoutes from "./src/routes/certificateRoutes.js";
+import chatRoutes from "./src/routes/chatRoutes.js";
+import crisisRoutes from "./src/routes/crisisRoutes.js";
 
 const app = express();
 
@@ -35,6 +38,9 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/invites", inviteRoutes);
 app.use("/api/participation", participationRoutes);
+app.use("/api/certificates", certificateRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/crises", crisisRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", async (req, res) => {

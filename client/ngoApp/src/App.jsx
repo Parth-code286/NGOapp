@@ -8,19 +8,23 @@ import NGOSignupPage from './pages/auth/NGOSignupPage';
 import NGODashboard from './pages/dashboard/NGODashboard';
 import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
 import ChatPage from './chat/pages/ChatPage';
+import Chatbot from './components/Chatbot/Chatbot';
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupChoicePage />} />
-      <Route path="/signup/volunteer" element={<VolunteerSignupPage />} />
-      <Route path="/signup/ngo" element={<NGOSignupPage />} />
-      <Route path="/dashboard/ngo" element={<NGODashboard />} />
-      <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
-      <Route path="/chat" element={<ChatPage/>} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupChoicePage />} />
+        <Route path="/signup/volunteer" element={<VolunteerSignupPage />} />
+        <Route path="/signup/ngo" element={<NGOSignupPage />} />
+        <Route path="/dashboard/ngo" element={<NGODashboard />} />
+        <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
+        <Route path="/chat" element={<ChatPage/>} />
+      </Routes>
+      <Chatbot />
+    </>
   );
 };
 

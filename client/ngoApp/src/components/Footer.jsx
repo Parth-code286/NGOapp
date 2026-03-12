@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Footer.css';
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="footer">
       <div className="container footer-content">
@@ -49,7 +51,7 @@ const Footer = () => {
       </div>
       
       <div className="footer-bottom container">
-        <p>&copy; {new Date().getFullYear()} ImpactHub. All rights reserved.</p>
+        <p>{t('footer.rights', '© 2024 ImpactHub. All rights reserved.')}</p>
       </div>
     </footer>
   );

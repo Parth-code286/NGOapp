@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Maison",
+    "features": "Caractéristiques",
+    "about": "À propos de nous",
+    "login": "Se connecter",
+    "dashboard": "Tableau de bord"
+  },
+  "hero": {
+    "title": "Bienvenue sur Impact Hub",
+    "subtitle": "Connecter des bénévoles passionnés à des événements significatifs d'ONG.",
+    "cta": "Commencez dès aujourd'hui"
+  },
+  "features": {
+    "title": "Nos fonctionnalités",
+    "f1_title": "Découvrez les événements",
+    "f1_desc": "Trouvez des événements locaux qui correspondent à vos intérêts.",
+    "f2_title": "Suivre l’impact",
+    "f2_desc": "Visualisez les contributions des bénévoles au fil du temps.",
+    "f3_title": "Bâtir des communautés",
+    "f3_desc": "Engagez-vous avec des personnes partageant les mêmes idées."
+  },
+  "footer": {
+    "rights": "© 2024 Impact Hub. Tous droits réservés."
+  }
+}

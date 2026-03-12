@@ -2,20 +2,27 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 
+import {
+  LayoutDashboard, PlusCircle, ClipboardList, Search, UserCheck,
+  BarChart2, MessageSquare, Users, AlertTriangle, PieChart,
+  Award, FileBadge, Map, Bell, User, LogOut
+} from 'lucide-react';
+
 const navItems = [
-  { id: 'overview', label: 'Dashboard', icon: '📊' },
-  { id: 'create-event', label: 'Create Event', icon: '➕' },
-  { id: 'manage-events', label: 'Manage Events', icon: '📋' },
-  { id: 'browse-volunteers', label: 'Browse Volunteers', icon: '🔍' },
-  { id: 'attendance', label: 'Attendance Tracking', icon: '✅', url: 'https://ngo-attendance.vercel.app' },
-  { id: 'visualization', label: 'Event Visualization', icon: '📈' },
-  { id: 'chat', label: 'Chat Section', icon: '💬' },
-  { id: 'volunteers', label: 'Volunteer Participation', icon: '🤝' },
-  { id: 'analytics', label: 'Impact Analytics', icon: '🔍' },
-  { id: 'impact-score', label: 'Community Impact Score', icon: '🏆' },
-  { id: 'certificates', label: 'Certificate Generator', icon: '🎓' },
-  { id: 'heatmap', label: 'Category Heat Map', icon: '🗺️' },
-  { id: 'notifications', label: 'Notifications', icon: '🔔' },
+  { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'create-event', label: 'Create Event', icon: PlusCircle },
+  { id: 'manage-events', label: 'Manage Events', icon: ClipboardList },
+  { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
+  { id: 'attendance', label: 'Attendance Tracking', icon: UserCheck, url: 'https://ngo-attendance.vercel.app' },
+  { id: 'visualization', label: 'Event Visualization', icon: BarChart2 },
+  { id: 'chat', label: 'Chat Section', icon: MessageSquare },
+  { id: 'volunteers', label: 'Volunteer Participation', icon: Users },
+  { id: 'crises', label: 'Crisis Broadcast', icon: AlertTriangle },
+  { id: 'analytics', label: 'Impact Analytics', icon: PieChart },
+  { id: 'impact-score', label: 'Community Impact Score', icon: Award },
+  { id: 'certificates', label: 'Certificate Generator', icon: FileBadge },
+  { id: 'heatmap', label: 'Category Heat Map', icon: Map },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
 const Sidebar = ({ activeSection, onSectionChange }) => {
@@ -67,7 +74,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
               }
             }}
           >
-            <span className="sidebar-icon">{item.icon}</span>
+            <span className="sidebar-icon"><item.icon size={20} /></span>
             <span className="sidebar-label">{item.label}</span>
             {item.id === 'notifications' && unreadCount > 0 && (
               <span className="notif-badge">{unreadCount}</span>
@@ -81,7 +88,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
           className={`sidebar-item ${activeSection === 'profile' ? 'active' : ''}`}
           onClick={() => onSectionChange('profile')}
         >
-          <span className="sidebar-icon">👤</span>
+          <span className="sidebar-icon"><User size={20} /></span>
           <span className="sidebar-label">My Profile</span>
         </button>
 
@@ -96,7 +103,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
         </div>
 
         <button className="sidebar-item logout-btn" onClick={handleLogout}>
-          <span className="sidebar-icon">🚪</span>
+          <span className="sidebar-icon"><LogOut size={20} /></span>
           <span className="sidebar-label">Logout</span>
         </button>
       </div>

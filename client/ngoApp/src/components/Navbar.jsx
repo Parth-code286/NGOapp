@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Navbar.css';
 
 const Navbar = ({ onLoginClick, onSignupClick }) => {
+  const { t, i18n } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -18,15 +20,25 @@ const Navbar = ({ onLoginClick, onSignupClick }) => {
         <a href="/" className="logo">
           Impact<span className="text-primary">Hub</span>
         </a>
-        
+
         <div className="nav-links">
-          <a href="#features" className="nav-link">Features</a>
+          <a href="#features" className="nav-link">{t('nav.features', 'Features')}</a>
           <a href="#how-it-works" className="nav-link">How it Works</a>
-          <a href="#about" className="nav-link">About</a>
+          <a href="#about" className="nav-link">{t('nav.about', 'About Us')}</a>
         </div>
 
         <div className="nav-actions">
-          <button className="btn btn-secondary" onClick={onLoginClick}>Log In</button>
+          <select
+            className="lang-switcher"
+            style={{ padding: '0.4rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)', cursor: 'pointer', outline: 'none', marginRight: '0.5rem' }}
+            value={i18n.language || 'en'}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+          >
+            <option value="en">English</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="mr">मराठी (Marathi)</option>
+          </select>
+          <button className="btn btn-secondary" onClick={onLoginClick}>{t('nav.login', 'Log In')}</button>
           <button className="btn btn-primary" onClick={onSignupClick}>Sign Up Free</button>
         </div>
       </div>
