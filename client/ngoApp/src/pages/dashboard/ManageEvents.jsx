@@ -185,7 +185,10 @@ const ManageEvents = () => {
               {events.map(ev => (
                 <div className="me-card" key={ev.id} onClick={() => openDetail(ev)}>
                   <div className="me-card-top">
-                    <span className="me-category-tag">{ev.category || 'Event'}</span>
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      <span className="me-category-tag">{ev.category || 'Event'}</span>
+                      {ev.is_emergency && <span className="me-emergency-tag">🚨 URGENT</span>}
+                    </div>
                     <span className={`me-status-dot ${ev.status || 'published'}`}>
                       {(ev.status || 'published').charAt(0).toUpperCase() + (ev.status || 'published').slice(1)}
                     </span>
@@ -362,11 +365,12 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
 
       <div className="me-modal-header">
         <h2 className="me-title" style={{ fontSize: '1.4rem' }}>{ev.title}</h2>
-        <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.4rem' }}>
+        <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.4rem', alignItems: 'center' }}>
           <span className={`me-status-dot ${ev.status || 'published'}`}>
             {(ev.status || 'published').charAt(0).toUpperCase() + (ev.status || 'published').slice(1)}
           </span>
           <span className="me-category-tag">{ev.category}</span>
+          {ev.is_emergency && <span className="me-emergency-tag">🚨 URGENT</span>}
         </div>
       </div>
 

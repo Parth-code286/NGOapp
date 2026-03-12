@@ -15,6 +15,7 @@ const CreateEvent = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [isEmergency, setIsEmergency] = useState(false);
 
   const toggleSkill = (skill) => {
     setSelectedSkills(prev =>
@@ -76,6 +77,7 @@ const CreateEvent = () => {
       contact_person:         getVal('contact_person'),
       contact_phone:          getVal('contact_phone'),
       contact_email:          getVal('contact_email') || user.email,
+      is_emergency:           isEmergency,
       status:                 'published',
     };
 
@@ -169,6 +171,34 @@ const CreateEvent = () => {
                 <option>Online</option>
                 <option>Hybrid</option>
               </select>
+            </div>
+            <div className="ce-field col-span-2" style={{ marginTop: '0.5rem' }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1rem', 
+                padding: '1.25rem', 
+                background: isEmergency ? '#fff5f5' : '#f8fafc', 
+                borderRadius: '16px', 
+                border: `2px solid ${isEmergency ? '#feb2b2' : '#e2e8f0'}`, 
+                cursor: 'pointer', 
+                transition: 'all 0.3s ease',
+                boxShadow: isEmergency ? '0 4px 12px rgba(239, 68, 68, 0.1)' : 'none'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={isEmergency} 
+                  onChange={(e) => setIsEmergency(e.target.checked)}
+                  style={{ width: '22px', height: '22px', accentColor: '#ef4444', cursor: 'pointer' }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontWeight: 800, color: isEmergency ? '#c53030' : '#1e293b', fontSize: '1.05rem' }}>🚨 Mark as Emergency Event</span>
+                    {isEmergency && <span style={{ background: '#feb2b2', color: '#9b2c2c', padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>High Priority</span>}
+                  </div>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: isEmergency ? '#e53e3e' : '#64748b', lineHeight: 1.4 }}>This event will be pinned to the top of volunteer browsing and broadcast an instant alert to all registered volunteers.</p>
+                </div>
+              </label>
             </div>
             <div className="ce-field col-span-2">
               <label>Event Description *</label>

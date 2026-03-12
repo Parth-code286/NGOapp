@@ -14,9 +14,36 @@ const VolunteerCrises = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
+  // QR & Payment Simulation State
+  const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'qr', 'invoice'
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [transactionId, setTransactionId] = useState('');
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [invoiceData, setInvoiceData] = useState(null);
+
   useEffect(() => {
     fetchActiveCrises();
   }, []);
+
+  // Timer for QR Payment
+  useEffect(() => {
+    let timer;
+    if (paymentStep === 'qr' && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && paymentStep === 'qr') {
+      setPaymentStep('form');
+      setErrorMsg('Payment session expired. Please try again.');
+    }
+    return () => clearInterval(timer);
+  }, [paymentStep, timeLeft]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const fetchActiveCrises = async () => {
     try {
@@ -37,48 +64,74 @@ const VolunteerCrises = () => {
     }
   };
 
-  const handleDonate = async (e) => {
+  const startPaymentFlow = (e) => {
     e.preventDefault();
-    setIsProcessing(true);
-    setSuccessMsg('');
+    if (!donationAmount || parseFloat(donationAmount) <= 0) {
+      setErrorMsg('Please enter a valid donation amount.');
+      return;
+    }
+    
+    // Generate a mock transaction ID (Like Razorpay)
+    const mockTxId = 'pay_' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    setTransactionId(mockTxId);
+    setPaymentStep('qr');
+    setTimeLeft(300);
     setErrorMsg('');
+  };
 
+  const handleSimulatePayment = async () => {
+    setIsProcessing(true);
+    // Simulate API delay for verification
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
     try {
       const res = await fetch(`http://localhost:5053/api/crises/${selectedCrisis.id}/donate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          volunteer_id: user.id || '00000000-0000-0000-0000-000000000000', // Fallback for testing
+          volunteer_id: user.id || '00000000-0000-0000-0000-000000000000',
           amount: parseFloat(donationAmount),
-          message: donationMessage
+          message: donationMessage || 'UPI Quick Donation',
+          transaction_id: transactionId
         })
       });
 
       const data = await res.json();
       if (res.ok) {
-        setSuccessMsg(`Successfully donated ₹${donationAmount} to ${selectedCrisis.title}!`);
-        // Optimistically update the local state so the UI progress bar fills instantly
+        setInvoiceData({
+          v_name: user.name || 'Anonymous Donor',
+          v_email: user.email || 'N/A',
+          c_title: selectedCrisis.title,
+          amount: donationAmount,
+          date: new Date().toLocaleString(),
+          tx_id: transactionId,
+          ngo: selectedCrisis.ngo_name || 'ImpactHub Partner'
+        });
+        
         setCrises(prevCrises => prevCrises.map(c => 
           c.id === selectedCrisis.id 
             ? { ...c, collected_amount: data.new_total } 
             : c
         ));
         
-        // Reset form
-        setTimeout(() => {
-          setSelectedCrisis(null);
-          setDonationAmount('');
-          setDonationMessage('');
-          setSuccessMsg('');
-        }, 3000);
+        setPaymentStep('invoice');
       } else {
-        setErrorMsg(data.error || 'Donation failed.');
+        setErrorMsg(data.error || 'Payment verification failed.');
       }
     } catch (err) {
-      setErrorMsg('Network error. Please try again.');
+      setErrorMsg('Network error verifying payment.');
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const closeModals = () => {
+    setSelectedCrisis(null);
+    setPaymentStep('form');
+    setDonationAmount('');
+    setDonationMessage('');
+    setErrorMsg('');
+    setSuccessMsg('');
   };
 
   return (
@@ -141,20 +194,16 @@ const VolunteerCrises = () => {
         }}>
           <div className="crisis-form-card" style={{ width: '100%', maxWidth: '500px', animation: 'scaleIn 0.2s ease-out' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <h3 style={{ margin: 0, borderBottom: 'none' }}>Support {selectedCrisis.title}</h3>
-              <button onClick={() => setSelectedCrisis(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+              <h3 style={{ margin: 0, borderBottom: 'none' }}>
+                {paymentStep === 'invoice' ? '✅ Payment Receipt' : `Support ${selectedCrisis.title}`}
+              </h3>
+              <button onClick={closeModals} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
             </div>
             
-            {successMsg && <div className="alert alert-success">{successMsg}</div>}
             {errorMsg && <div className="alert alert-error">{errorMsg}</div>}
 
-            {!successMsg && (
-              <form onSubmit={handleDonate}>
-                {selectedCrisis.upi_id && (
-                  <div className="alert alert-info" style={{ marginBottom: '1rem', background: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd' }}>
-                    <strong>Direct UPI Payment:</strong> {selectedCrisis.upi_id}
-                  </div>
-                )}
+            {paymentStep === 'form' && (
+              <form onSubmit={startPaymentFlow}>
                 <div className="form-group">
                   <label>Donation Amount (₹)</label>
                   <input 
@@ -177,10 +226,80 @@ const VolunteerCrises = () => {
                   />
                 </div>
 
-                <button type="submit" className="btn btn-danger submit-btn" disabled={isProcessing}>
-                  {isProcessing ? 'Processing Securely...' : `Donate ₹${donationAmount || '0'} Now`}
+                <button type="submit" className="btn btn-danger submit-btn">
+                  Continue to Payment
                 </button>
               </form>
+            )}
+
+            {paymentStep === 'qr' && (
+              <div className="qr-payment-view" style={{ textAlign: 'center' }}>
+                <p style={{ margin: '0 0 1rem 0', fontWeight: '500' }}>Scan QR via any UPI App</p>
+                
+                <div style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '2px solid #fee2e2', display: 'inline-block', marginBottom: '1rem' }}>
+                   {/* UPI QR generation via public API */}
+                   <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${selectedCrisis.upi_id || 'ngo@upi'}&pn=${selectedCrisis.title}&am=${donationAmount}&cu=INR`)}`} 
+                    alt="Payment QR" 
+                    style={{ display: 'block', margin: '0 auto' }}
+                   />
+                </div>
+
+                <div className="payment-timer" style={{ fontSize: '1.1rem', fontWeight: 'bold', color: timeLeft < 60 ? '#ef4444' : '#1e3a8a' }}>
+                  ⏳ Session expires in: {formatTime(timeLeft)}
+                </div>
+
+                <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', fontSize: '0.9rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span>Amount:</span> <strong>₹{donationAmount}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>TX ID:</span> <code style={{ color: '#0369a1' }}>{transactionId}</code>
+                  </div>
+                </div>
+
+                <button 
+                  className="btn btn-success submit-btn" 
+                  style={{ marginTop: '1.5rem', background: '#059669' }}
+                  onClick={handleSimulatePayment}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? 'Verifying Payment...' : '✅ I have scanned & paid'}
+                </button>
+              </div>
+            )}
+
+            {paymentStep === 'invoice' && invoiceData && (
+              <div className="invoice-container animated-scale-in">
+                 <div className="invoice-header-box" style={{ background: '#ecfdf5', padding: '1.5rem', borderRadius: '12px', textAlign: 'center', marginBottom: '1.5rem', border: '1px solid #10b981' }}>
+                    <div style={{ fontSize: '2.5rem' }}>🛡️</div>
+                    <h2 style={{ color: '#065f46', margin: '0.5rem 0' }}>Impact Verified</h2>
+                    <p style={{ color: '#059669', margin: 0 }}>Your donation has been successfully processed.</p>
+                 </div>
+
+                 <div className="invoice-details" style={{ fontSize: '0.95rem', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden' }}>
+                    {[
+                      ['Volunteer', invoiceData.v_name],
+                      ['Email', invoiceData.v_email],
+                      ['Crisis', invoiceData.c_title],
+                      ['Amount Paid', `₹${invoiceData.amount}`],
+                      ['Date', invoiceData.date],
+                      ['Transaction ID', invoiceData.tx_id]
+                    ].map(([label, val], i) => (
+                      <div key={label} style={{ display: 'flex', padding: '0.75rem 1rem', borderTop: i === 0 ? 'none' : '1px solid #f1f5f9', background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                        <span style={{ color: '#64748b', width: '130px', flexShrink: 0 }}>{label}</span>
+                        <span style={{ fontWeight: '600', color: '#1e293b' }}>{val}</span>
+                      </div>
+                    ))}
+                 </div>
+
+                 <button className="btn submit-btn" onClick={() => window.print()} style={{ marginTop: '1.5rem', background: '#1e40af' }}>
+                   Print Receipt (PDF)
+                 </button>
+                 <button className="btn" onClick={closeModals} style={{ marginTop: '0.5rem', background: 'none', color: '#64748b', border: '1px solid #e2e8f0' }}>
+                   Return to Dashboard
+                 </button>
+              </div>
             )}
           </div>
         </div>

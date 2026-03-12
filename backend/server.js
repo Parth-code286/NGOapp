@@ -16,6 +16,7 @@ import participationRoutes from "./src/routes/participationRoutes.js";
 import certificateRoutes from "./src/routes/certificateRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 import crisisRoutes from "./src/routes/crisisRoutes.js";
+import paymentRoutes from "./src/routes/paymentRoutes.js";
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/participation", participationRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/crises", crisisRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", async (req, res) => {

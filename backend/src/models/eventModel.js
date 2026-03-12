@@ -16,7 +16,7 @@ export const eventModel = {
 
     // Get all events (with optional filters)
     getAll: async (filters = {}) => {
-        let query = supabase.from("events").select("*").order("event_date", { ascending: true });
+        let query = supabase.from("events").select("*").order("is_emergency", { ascending: false }).order("event_date", { ascending: true });
 
         if (filters.category) query = query.eq("category", filters.category);
         if (filters.mode) query = query.eq("mode", filters.mode);

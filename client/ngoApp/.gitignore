@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# PWA dev generated files — do not commit these
+dev-dist/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
