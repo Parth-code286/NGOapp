@@ -61,15 +61,33 @@ const ChatPage = () => {
         const stored = JSON.parse(localStorage.getItem("user") || "{}");
         if (stored?.id) {
           // Match by user_ref_id (the volunteer/ngo table ID stored at login)
-          const matched = unique.find((u) => u.user_ref_id === stored.id);
+          let matched = unique.find((u) => u.user_ref_id === stored.id);
+
+          // Fallback: match by name
+          if (!matched) {
+            matched = unique.find(
+              (u) => u.name?.toLowerCase() === stored.name?.toLowerCase()
+            );
+          }
+
           if (matched) {
             setCurrentUser(matched);
           } else {
-            // Fallback: match by name if ref not found
-            const byName = unique.find(
-              (u) => u.name?.toLowerCase() === stored.name?.toLowerCase()
-            );
-            if (byName) setCurrentUser(byName);
+            // User is logged in but has no chat_users row — create one now
+            const { data: newUser, error } = await supabase
+              .from("chat_users")
+              .insert({
+                name: stored.name,
+                user_type: stored.role, // 'volunteer' or 'ngo'
+                user_ref_id: stored.id,
+              })
+              .select()
+              .single();
+
+            if (!error && newUser) {
+              setUsers((prev) => [...prev, newUser]);
+              setCurrentUser(newUser);
+            }
           }
         }
       } catch (_) {

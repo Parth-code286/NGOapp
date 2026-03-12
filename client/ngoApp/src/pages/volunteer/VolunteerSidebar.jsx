@@ -13,7 +13,7 @@ const volunteerNavItems = [
   { id: 'visualization',label: 'Event Visualization',  icon: '📈' },
   { id: 'community',   label: 'Community Hub',         icon: '🤝' },
   { id: 'leaderboard', label: 'Leaderboard',           icon: '🏆' },
-  { id: 'chat',        label: 'Chat Section',          icon: '💬' },
+  { id: 'chat',        label: 'Chat Section',          icon: '💬', route: '/chat' },
   { id: 'notifications',label: 'Notifications',        icon: '🔔' },
   { id: 'attendance',  label: 'Attendance Section',    icon: '✅', url: 'https://ngo-attendance.vercel.app' },
 ];
@@ -62,6 +62,8 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
             onClick={() => {
               if (item.url) {
                 window.open(item.url, '_blank');
+              } else if (item.route) {
+                navigate(item.route);
               } else {
                 onSectionChange(item.id);
               }

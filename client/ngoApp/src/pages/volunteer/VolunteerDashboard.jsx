@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import VolunteerSidebar from './VolunteerSidebar';
 import VolunteerOverview from './VolunteerOverview';
 import DesignCalendar from './DesignCalendar';
@@ -25,6 +26,7 @@ const ComingSoon = ({ title }) => (
 
 const VolunteerDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
+  const navigate = useNavigate();
 
   const renderContent = () => {
     switch (activeSection) {
@@ -38,7 +40,7 @@ const VolunteerDashboard = () => {
       case 'visualization':  return <EventVisualization />;
       case 'community':      return <Community />;
       case 'leaderboard':    return <Leaderboard />;
-      case 'chat':           return <ComingSoon title="Chat Section" />;
+      case 'chat':           { navigate('/chat'); return null; }
       case 'notifications':  return <VolunteerNotifications />;
       case 'attendance':     return <ComingSoon title="Attendance Section" />;
       case 'profile':        return <VolunteerProfile />;
