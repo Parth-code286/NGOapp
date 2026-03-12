@@ -31,7 +31,7 @@ const leaderboard = [
   { rank: 14, name: 'You',           points: 1320, badge: '⭐', highlight: true },
 ];
 
-const VolunteerOverview = () => {
+const VolunteerOverview = ({ onSectionChange }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
@@ -41,7 +41,9 @@ const VolunteerOverview = () => {
           <h1 className="overview-title">Hi, <span className="text-vol">{user.name || 'Volunteer'}</span> 👋</h1>
           <p className="overview-subtitle">Here's your volunteering activity and upcoming events.</p>
         </div>
-        <button className="btn btn-vol browse-btn">🔍 Browse Events</button>
+        <button className="btn btn-vol browse-btn" onClick={() => onSectionChange('browse')}>
+          🔍 Browse Events
+        </button>
       </div>
 
       {/* Stats Grid */}

@@ -13,6 +13,7 @@ import NGOListing from './NGOListing';
 import CheckInvites from './CheckInvites';
 import EventVisualization from './EventVisualization';
 import Certificates from './Certificates';
+import VolunteerCrises from './VolunteerCrises';
 import '../dashboard/NGODashboard.css';
 
 const ComingSoon = ({ title }) => (
@@ -31,7 +32,7 @@ const VolunteerDashboard = () => {
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'overview':       return <VolunteerOverview />;
+      case 'overview':       return <VolunteerOverview onSectionChange={setActiveSection} />;
       case 'calendar':       return <DesignCalendar />;
       case 'browse':         return <BrowseEvents />;
       case 'registered':     return <RegisteredEvents />;
@@ -42,10 +43,11 @@ const VolunteerDashboard = () => {
       case 'community':      return <Community />;
       case 'leaderboard':    return <Leaderboard />;
       case 'chat':           { navigate('/chat'); return null; }
+      case 'crises':         return <VolunteerCrises />;
       case 'notifications':  return <VolunteerNotifications />;
       case 'attendance':     return <ComingSoon title="Attendance Section" />;
       case 'profile':        return <VolunteerProfile />;
-      default:               return <VolunteerOverview />;
+      default:               return <VolunteerOverview onSectionChange={setActiveSection} />;
     }
   };
 

@@ -1,20 +1,22 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Hero.css';
 
 const Hero = () => {
+  const { t } = useTranslation();
   return (
     <section className="hero">
       <div className="container hero-container">
         <div className="hero-content animate-fade-in">
           <div className="badge">✨ Revolutionizing NGO Operations</div>
           <h1 className="hero-title">
-            Empower Your <span className="text-primary">Volunteers</span>, Amplify Your <span className="text-gradient">Impact</span>
+            {t('hero.title', 'Welcome to Impact Hub')}
           </h1>
           <p className="hero-subtitle">
-            The all-in-one centralized platform for NGOs to post events, seamlessly manage registrations, and track real-time attendance without the hassle of fragmented communication.
+            {t('hero.subtitle', 'Connecting Passionate Volunteers with Meaningful NGO Events.')}
           </p>
           <div className="hero-actions">
-            <button className="btn btn-primary btn-lg">Start for Free</button>
+            <button className="btn btn-primary btn-lg">{t('hero.cta', 'Start for Free')}</button>
             <button className="btn btn-secondary btn-lg btn-outline">Watch Demo</button>
           </div>
           

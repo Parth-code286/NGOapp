@@ -25,7 +25,7 @@ const topVolunteers = [
   { name: 'Arjun Nair', events: 8, hours: 32, location: 'Bangalore' },
 ];
 
-const DashboardOverview = () => {
+const DashboardOverview = ({ onSectionChange }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
@@ -35,7 +35,9 @@ const DashboardOverview = () => {
           <h1 className="overview-title">Welcome back, <span className="text-primary">{user.name || 'Admin'}</span> 👋</h1>
           <p className="overview-subtitle">Here's what's happening with your NGO today.</p>
         </div>
-        <button className="btn btn-primary create-btn">+ Create New Event</button>
+        <button className="btn btn-primary create-btn" onClick={() => onSectionChange('create-event')}>
+          + Create New Event
+        </button>
       </div>
 
       {/* Stats Grid */}
