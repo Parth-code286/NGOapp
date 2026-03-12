@@ -10,9 +10,9 @@ import {
 
 const navItems = [
   { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'create-event', label: 'Create Event', icon: PlusCircle },
-  { id: 'manage-events', label: 'Manage Events', icon: ClipboardList },
-  { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
+  // { id: 'create-event', label: 'Create Event', icon: PlusCircle },
+  // { id: 'manage-events', label: 'Manage Events', icon: ClipboardList },
+  // { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
   { id: 'attendance', label: 'Attendance Tracking', icon: UserCheck, url: 'https://ngo-attendance.vercel.app' },
   { id: 'visualization', label: 'Event Visualization', icon: BarChart2 },
   { id: 'chat', label: 'Chat Section', icon: MessageSquare, route: '/chat' },
@@ -20,9 +20,10 @@ const navItems = [
   { id: 'crises', label: 'Crisis Broadcast', icon: AlertTriangle },
   { id: 'analytics', label: 'Impact Analytics', icon: PieChart },
   { id: 'impact-score', label: 'Community Impact Score', icon: Award },
-  { id: 'certificates', label: 'Certificate Generator', icon: FileBadge },
+  // { id: 'certificates', label: 'Certificate Generator', icon: FileBadge },
   { id: 'heatmap', label: 'Category Heat Map', icon: Map },
   { id: 'notifications', label: 'Notifications', icon: Bell },
+  
 ];
 
 const Sidebar = ({ activeSection, onSectionChange }) => {

@@ -1,32 +1,95 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import './DashboardOverview.css';
-
-const stats = [
-  { label: 'Events Posted', value: '24', icon: '📅', change: '+3 this month', color: 'stat-yellow' },
-  { label: 'Total Volunteers', value: '1,248', icon: '🤝', change: '+87 this month', color: 'stat-blue' },
-  { label: 'Avg. Volunteers/Event', value: '52', icon: '👥', change: '+5 vs last month', color: 'stat-green' },
-  { label: 'Attendance Rate', value: '89%', icon: '✅', change: '+2% improvement', color: 'stat-purple' },
-  { label: 'Impact Score', value: '4,730', icon: '🏆', change: '+320 this month', color: 'stat-orange' },
-  { label: 'Certificates Issued', value: '863', icon: '🎓', change: '+112 this month', color: 'stat-teal' },
-];
-
-const recentEvents = [
-  { name: 'Beach Cleanup Drive', date: 'Mar 10, 2026', volunteers: 78, status: 'completed' },
-  { name: 'Tree Plantation Drive', date: 'Mar 14, 2026', volunteers: 45, status: 'upcoming' },
-  { name: 'Blood Donation Camp', date: 'Mar 18, 2026', volunteers: 102, status: 'upcoming' },
-  { name: 'Digital Literacy Workshop', date: 'Feb 28, 2026', volunteers: 33, status: 'completed' },
-  { name: 'Food Distribution Drive', date: 'Feb 20, 2026', volunteers: 60, status: 'completed' },
-];
-
-const topVolunteers = [
-  { name: 'Ananya Sharma', events: 12, hours: 48, location: 'Mumbai' },
-  { name: 'Rahul Mehta', events: 10, hours: 40, location: 'Pune' },
-  { name: 'Priya Singh', events: 9, hours: 36, location: 'Delhi' },
-  { name: 'Arjun Nair', events: 8, hours: 32, location: 'Bangalore' },
-];
 
 const DashboardOverview = ({ onSectionChange }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [stats, setStats] = useState([
+    { label: 'Events Posted', value: '0', icon: '📅', color: 'stat-yellow' },
+    { label: 'Total Volunteers', value: '0', icon: '🤝', color: 'stat-blue' },
+    { label: 'Active Participation', value: '0', icon: '👥', color: 'stat-green' },
+    { label: 'Attendance Rate', value: '0%', icon: '✅', color: 'stat-purple' },
+    { label: 'Impact Score', value: '0', icon: '🏆', color: 'stat-orange' },
+    { label: 'Pending Approvals', value: '0', icon: '⏳', color: 'stat-teal' },
+  ]);
+  const [recentEvents, setRecentEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboardData = async () => {
+    try {
+      // 1. Fetch Events Posted
+      const { count: eventCount } = await supabase
+        .from('events')
+        .select('*', { count: 'exact', head: true })
+        .eq('ngo_id', user.id);
+
+      // 2. Fetch Recent Events
+      const { data: eventsData } = await supabase
+        .from('events')
+        .select('title, event_date, category, status')
+        .eq('ngo_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      // 3. Fetch Total Volunteers & Participation
+      const { data: registrations } = await supabase
+        .from('event_registrations')
+        .select('volunteer_id, status, events!inner(ngo_id)')
+        .eq('events.ngo_id', user.id);
+
+      const uniqueVols = new Set(registrations?.map(r => r.volunteer_id)).size;
+      const activeParticipation = registrations?.filter(r => r.status === 'approved').length;
+      const pendingApprovals = registrations?.filter(r => r.status === 'pending' || !r.status).length;
+
+      // 4. Attendance Rate
+      const { data: attendanceData } = await supabase
+        .from('attendance')
+        .select('verified, events!inner(ngo_id)')
+        .eq('events.ngo_id', user.id);
+      
+      const verifiedCount = attendanceData?.filter(a => a.verified).length || 0;
+      const totalAttendanceRecords = attendanceData?.length || 0;
+      const attendRate = totalAttendanceRecords > 0 ? Math.round((verifiedCount / totalAttendanceRecords) * 100) : 0;
+
+      setStats([
+        { label: 'Events Posted', value: eventCount || 0, icon: '📅', color: 'stat-yellow' },
+        { label: 'Total Volunteers', value: uniqueVols || 0, icon: '🤝', color: 'stat-blue' },
+        { label: 'Active Participants', value: activeParticipation || 0, icon: '👥', color: 'stat-green' },
+        { label: 'Attendance Rate', value: `${attendRate}%`, icon: '✅', color: 'stat-purple' },
+        { label: 'Impact Score', value: (activeParticipation * 50) + (eventCount * 100), icon: '🏆', color: 'stat-orange' },
+        { label: 'Pending Approvals', value: pendingApprovals || 0, icon: '⏳', color: 'stat-teal' },
+      ]);
+
+      setRecentEvents(eventsData?.map(ev => ({
+        name: ev.title,
+        date: new Date(ev.event_date).toLocaleDateString(),
+        status: ev.status || 'upcoming'
+      })) || []);
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on('postgres_changes', { event: '*', table: 'events', filter: `ngo_id=eq.${user.id}` }, () => fetchDashboardData())
+      .on('postgres_changes', { event: '*', table: 'event_registrations' }, () => fetchDashboardData())
+      .on('postgres_changes', { event: '*', table: 'attendance' }, () => fetchDashboardData())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  if (loading) return <div className="loading-state">Syncing real-time impact...</div>;
 
   return (
     <div className="overview-container">
@@ -35,12 +98,16 @@ const DashboardOverview = ({ onSectionChange }) => {
           <h1 className="overview-title">Welcome back, <span className="text-primary">{user.name || 'Admin'}</span> 👋</h1>
           <p className="overview-subtitle">Here's what's happening with your NGO today.</p>
         </div>
-        <button className="btn btn-primary create-btn" onClick={() => onSectionChange('create-event')}>
-          + Create New Event
-        </button>
+        <div className="header-actions">
+          <button className="btn btn-secondary discover-btn" onClick={() => onSectionChange('browse-volunteers')}>
+            🔍 Discover Volunteers
+          </button>
+          <button className="btn btn-primary create-btn" onClick={() => onSectionChange('create-event')}>
+            + Create New Event
+          </button>
+        </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="stats-grid">
         {stats.map((stat, i) => (
           <div className={`stat-card ${stat.color}`} key={i}>
@@ -49,95 +116,82 @@ const DashboardOverview = ({ onSectionChange }) => {
               <div className="stat-value">{stat.value}</div>
             </div>
             <div className="stat-label-text">{stat.label}</div>
-            <div className="stat-change">↑ {stat.change}</div>
+            <div className="stat-change">Live Updates Engaged</div>
           </div>
         ))}
       </div>
 
       <div className="overview-grid-2">
-        {/* Recent Events */}
         <div className="overview-card">
           <div className="card-header">
-            <h3 className="card-title">Recent Events</h3>
-            <button className="text-link">View all →</button>
+            <h3 className="card-title">Recent Activity</h3>
+            <button className="text-link" onClick={() => onSectionChange('manage-events')}>View all →</button>
           </div>
           <table className="data-table">
             <thead>
               <tr>
                 <th>Event</th>
                 <th>Date</th>
-                <th>Volunteers</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {recentEvents.map((ev, i) => (
+              {recentEvents.length > 0 ? recentEvents.map((ev, i) => (
                 <tr key={i}>
                   <td className="event-name">{ev.name}</td>
                   <td>{ev.date}</td>
-                  <td>{ev.volunteers}</td>
                   <td>
                     <span className={`status-pill ${ev.status}`}>
                       {ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
                     </span>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan="3" style={{ textAlign: 'center', padding: '2rem' }}>No recent events found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        {/* Top Volunteers */}
         <div className="overview-card">
           <div className="card-header">
-            <h3 className="card-title">Top Volunteers</h3>
-            <button className="text-link">View all →</button>
+            <h3 className="card-title">Quick Stats</h3>
           </div>
-          <div className="volunteer-list">
-            {topVolunteers.map((v, i) => (
-              <div className="volunteer-row" key={i}>
-                <div className="vol-rank">{i + 1}</div>
-                <div className="vol-avatar">{v.name[0]}</div>
-                <div className="vol-info">
-                  <div className="vol-name">{v.name}</div>
-                  <div className="vol-sub">{v.location} · {v.events} events · {v.hours}h</div>
-                </div>
-                <div className="vol-badge">🏅</div>
-              </div>
-            ))}
+          <div className="quick-stats-summary">
+            <div className="qs-item">
+              <span>Verified Attendance</span>
+              <strong>{stats[3].value}</strong>
+            </div>
+            <div className="qs-item">
+              <span>Community Impact</span>
+              <strong>{stats[4].value} pts</strong>
+            </div>
+            <div className="qs-item" style={{ border: 'none' }}>
+              <span>Connection Status</span>
+              <span className="live-indicator"><span className="ping-dot"></span> Supabase Realtime</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Quick action banners */}
       <div className="quick-actions-row">
-        <div className="quick-card yellow">
+        <div className="quick-card yellow" onClick={() => onSectionChange('notifications')}>
           <div className="qc-icon">📢</div>
-          <div>
-            <div className="qc-title">Send Notification</div>
-            <div className="qc-sub">Broadcast to all volunteers</div>
-          </div>
+          <div><div className="qc-title">Send Notification</div><div className="qc-sub">Broadcast to volunteers</div></div>
         </div>
-        <div className="quick-card blue">
+        <div className="quick-card blue" onClick={() => onSectionChange('certificates')}>
           <div className="qc-icon">🎓</div>
-          <div>
-            <div className="qc-title">Issue Certificates</div>
-            <div className="qc-sub">For completed events</div>
-          </div>
+          <div><div className="qc-title">Certificates</div><div className="qc-sub">Automated issuance</div></div>
         </div>
-        <div className="quick-card green">
+        <div className="quick-card green" onClick={() => onSectionChange('analytics')}>
           <div className="qc-icon">📊</div>
-          <div>
-            <div className="qc-title">View Analytics</div>
-            <div className="qc-sub">Impact & engagement report</div>
-          </div>
+          <div><div className="qc-title">Analytics</div><div className="qc-sub">Data-driven insights</div></div>
         </div>
-        <div className="quick-card purple">
+        <div className="quick-card purple" onClick={() => onSectionChange('attendance')}>
           <div className="qc-icon">✅</div>
-          <div>
-            <div className="qc-title">Mark Attendance</div>
-            <div className="qc-sub">Open attendance for event</div>
-          </div>
+          <div><div className="qc-title">Attendance</div><div className="qc-sub">Real-time verification</div></div>
         </div>
       </div>
     </div>

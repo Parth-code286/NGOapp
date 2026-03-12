@@ -10,6 +10,7 @@ import VolunteerNotifications from '../volunteer/VolunteerNotifications';
 import EventVisualization from '../volunteer/EventVisualization';
 import VolunteerParticipation from './VolunteerParticipation';
 import ImpactAnalytics from './ImpactAnalytics';
+import AnalyticsHeatmap from './AnalyticsHeatmap';
 import ImpactScore from './ImpactScore';
 import CrisisManagement from './CrisisManagement';
 import './NGODashboard.css';
@@ -40,7 +41,7 @@ const NGODashboard = () => {
       case 'attendance':
         return <ComingSoon title="Attendance Tracking" />;
       case 'visualization':
-        return <EventVisualization />;
+        return <EventVisualization onSectionChange={setActiveSection} />;
       case 'chat':
         navigate('/chat'); return null;
       case 'volunteers':

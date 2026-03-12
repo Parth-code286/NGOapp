@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import EventDetailModal from '../../components/EventDetailModal';
 import './BrowseEvents.css'; /* Reuse same base styles */
 import './RegisteredEvents.css';
@@ -22,24 +23,40 @@ const RegisteredEvents = () => {
   const [cancelStatus,   setCancelStatus]  = useState({});
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  useEffect(() => {
+  const fetchRegs = async () => {
     if (!user.id) return;
-    const fetchRegs = async () => {
-      setLoading(true);
-      try {
-        const res  = await fetch(`${API_BASE}/events/registrations/volunteer/${user.id}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to load registrations');
-        setRegistrations(data.registrations || []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('event_registrations')
+        .select('*, events(*)')
+        .eq('volunteer_id', user.id);
+      
+      if (fetchError) throw fetchError;
+      setRegistrations(data || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchRegs();
+
+    const channel = supabase
+      .channel(`volunteer-regs-${user.id}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'event_registrations', 
+        filter: `volunteer_id=eq.${user.id}` 
+      }, () => fetchRegs())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user.id]);
 
   const handleCancel = async (eventId, regId) => {

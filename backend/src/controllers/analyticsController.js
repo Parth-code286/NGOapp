@@ -4,17 +4,28 @@ import supabase from "../config/supabaseClient.js";
 const geoCache = {};
 
 async function geocodeLocation(city, state, country) {
-  const query = `${city}, ${state || ''}, ${country || 'India'}`.trim();
-  if (geoCache[query]) return geoCache[query];
+  // Safe filtering: remove null/undefined/empty segments
+  const segments = [city, state, country || 'India'].filter(seg => seg && seg !== 'null' && seg !== 'undefined');
+  const query = segments.join(', ').trim();
+  
+  if (!query || geoCache[query]) return geoCache[query];
 
   try {
+    // Add 1s delay to respect Nominatim policy
+    await new Promise(r => setTimeout(r, 1100));
+
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'ImpactHub-Analytics/1.0 (contact@impacthub.org)',
         'Accept-Language': 'en-US,en;q=0.9',
         'Referer': 'http://localhost:5053/'
       }
     });
+
+    if (res.status === 429) {
+      console.warn("Nominatim Rate Limit hit on backend.");
+      return null;
+    }
 
     if (res.ok) {
       const data = await res.json();
