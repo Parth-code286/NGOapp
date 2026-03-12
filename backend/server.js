@@ -9,6 +9,7 @@ import gamificationRoutes from "./src/routes/gamificationRoutes.js";
 import ngoProfileRoutes from "./src/routes/ngoProfileRoutes.js";
 import volunteerProfileRoutes from "./src/routes/volunteerProfileRoutes.js";
 import calendarRoutes from "./src/routes/calendarRoutes.js";
+import analyticsRoutes from "./src/routes/analyticsRoutes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/gamification", gamificationRoutes);
 app.use("/api/ngo", ngoProfileRoutes);
 app.use("/api/volunteer", volunteerProfileRoutes);
 app.use("/api/calendar", calendarRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", async (req, res) => {

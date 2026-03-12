@@ -12,6 +12,7 @@ export const registerVolunteer = async (req, res) => {
       fullName, dob, gender, nationality,
       email, phone,
       city, state, country, pincode,
+      lat, lng,
       aadhar, pan, interests, password,
     } = req.body;
 
@@ -41,6 +42,8 @@ export const registerVolunteer = async (req, res) => {
         state,
         country,
         pincode,
+        lat: lat || null,
+        lng: lng || null,
         aadhar,
         pan,
         interests,

@@ -5,6 +5,7 @@ import CreateEvent from './CreateEvent';
 import ManageEvents from './ManageEvents';
 import BrowseVolunteers from './BrowseVolunteers';
 import NGOProfile from './NGOProfile';
+import AnalyticsHeatmap from './AnalyticsHeatmap';
 import './NGODashboard.css';
 
 // Placeholder section for unbuilt features
@@ -39,6 +40,8 @@ const NGODashboard = () => {
         return <ComingSoon title="Volunteer Participation Tracking" />;
       case 'analytics':
         return <ComingSoon title="Impact Analytical Dashboard" />;
+      case 'heatmap':
+        return <AnalyticsHeatmap />;
       case 'impact-score':
         return <ComingSoon title="Community Impact Score" />;
       case 'certificates':
