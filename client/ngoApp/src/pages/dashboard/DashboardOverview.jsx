@@ -35,9 +35,14 @@ const DashboardOverview = ({ onSectionChange }) => {
           <h1 className="overview-title">Welcome back, <span className="text-primary">{user.name || 'Admin'}</span> 👋</h1>
           <p className="overview-subtitle">Here's what's happening with your NGO today.</p>
         </div>
-        <button className="btn btn-primary create-btn" onClick={() => onSectionChange('create-event')}>
-          + Create New Event
-        </button>
+        <div className="header-actions">
+          <button className="btn btn-secondary manage-btn" onClick={() => onSectionChange('manage-events')}>
+            ⚙️ Manage Events
+          </button>
+          <button className="btn btn-primary create-btn" onClick={() => onSectionChange('create-event')}>
+            + Create New Event
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
