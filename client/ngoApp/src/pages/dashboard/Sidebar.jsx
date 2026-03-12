@@ -13,7 +13,6 @@ const navItems = [
   { id: 'volunteers', label: 'Volunteer Participation', icon: '🤝' },
   { id: 'analytics', label: 'Impact Analytics', icon: '🔍' },
   { id: 'impact-score', label: 'Community Impact Score', icon: '🏆' },
-  { id: 'certificates', label: 'Certificate Generator', icon: '🎓' },
   { id: 'heatmap', label: 'Category Heat Map', icon: '🗺️' },
   { id: 'notifications', label: 'Notifications', icon: '🔔' },
 ];
