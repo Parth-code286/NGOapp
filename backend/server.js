@@ -22,7 +22,12 @@ const app = express();
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+  origin: [
+    "http://localhost:5173", 
+    "http://localhost:5174", 
+    "http://localhost:3000",
+    process.env.FRONTEND_URL // <-- Added to support your Vercel URL dynamically
+  ].filter(Boolean), // .filter(Boolean) safely removes undefined if FRONTEND_URL is not set yet
   credentials: true,
 }));
 app.use(express.json());
