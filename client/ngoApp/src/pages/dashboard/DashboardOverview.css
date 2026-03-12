@@ -40,7 +40,7 @@
   white-space: nowrap;
 }
 
-.manage-btn {
+.discover-btn {
   background-color: var(--bg-pure);
   border: 1px solid var(--border);
   color: var(--text-main);
