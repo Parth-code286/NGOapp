@@ -53,7 +53,7 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
-const EventVisualization = () => {
+const EventVisualization = ({ onSectionChange }) => {
   const [events, setEvents] = useState([]);
   const [ngos, setNgos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +63,8 @@ const EventVisualization = () => {
   const [geocodedData, setGeocodedData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = user.role || 'volunteer';
 
   useEffect(() => {
     // Get user location
@@ -98,42 +100,73 @@ const EventVisualization = () => {
     const geocodeAll = async () => {
       setIsGeocoding(true);
       const itemsToGeocode = [
-        ...events.map(e => ({ ...e, geoType: 'events', addressString: `${e.venue_name || ''}, ${e.city}, ${e.state}`, fallbackString: `${e.city}, ${e.state}` })),
-        ...ngos.map(n => ({ ...n, geoType: 'ngo', addressString: `${n.city}, ${n.state}`, fallbackString: `${n.city}, ${n.state}` }))
+        ...events.map(e => ({ 
+          ...e, 
+          geoType: 'events', 
+          addressString: [e.venue_name, e.city, e.state].filter(Boolean).join(', '), 
+          fallbackString: [e.city, e.state].filter(Boolean).join(', ') 
+        })),
+        ...ngos.map(n => ({ 
+          ...n, 
+          geoType: 'ngo', 
+          addressString: [n.city, n.state].filter(Boolean).join(', '), 
+          fallbackString: [n.city, n.state].filter(Boolean).join(', ') 
+        }))
       ];
 
       const geocoded = [];
-      const cache = new Map();
+      const cachedCoords = JSON.parse(localStorage.getItem('map_geo_cache') || '{}');
+      let cacheUpdated = false;
 
       for (const item of itemsToGeocode) {
-        const fullKey = item.addressString.toLowerCase();
-        const cityKey = item.fallbackString.toLowerCase();
+        if (!item.addressString) continue;
 
-        if (cache.has(fullKey)) {
-          geocoded.push({ ...item, coords: cache.get(fullKey) });
+        const fullKey = item.addressString.toLowerCase();
+        
+        if (cachedCoords[fullKey]) {
+          geocoded.push({ ...item, coords: cachedCoords[fullKey] });
           continue;
         }
 
         try {
-          await new Promise(r => setTimeout(r, 400)); // Delay for Nominatim rate limits
-          let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.addressString)}&limit=1`);
+          // Nominatim requires 1 second between requests
+          await new Promise(r => setTimeout(r, 1000)); 
+          
+          let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.addressString)}&limit=1`, {
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (res.status === 429) {
+            console.error("Nominatim Rate Limit hit. Retrying later...");
+            continue;
+          }
+
           let data = await res.json();
           
           if (!data || data.length === 0) {
             // Fallback to City, State
+            await new Promise(r => setTimeout(r, 1000));
             res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.fallbackString)}&limit=1`);
             data = await res.json();
           }
 
           if (data && data[0]) {
             const loc = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-            cache.set(fullKey, loc);
+            cachedCoords[fullKey] = loc;
+            cacheUpdated = true;
             geocoded.push({ ...item, coords: loc });
           }
         } catch (e) {
-          console.error("Geocode failure:", e);
+          console.error("Geocode failure for:", item.addressString, e);
         }
       }
+
+      if (cacheUpdated) {
+        localStorage.setItem('map_geo_cache', JSON.stringify(cachedCoords));
+      }
+
       setGeocodedData(geocoded);
       setIsGeocoding(false);
     };
@@ -260,6 +293,9 @@ const EventVisualization = () => {
       {selectedItem && (
         <DetailModal 
           item={selectedItem} 
+          userRole={userRole}
+          userId={user.id}
+          onSectionChange={onSectionChange}
           onClose={() => setSelectedItem(null)} 
         />
       )}
@@ -267,8 +303,9 @@ const EventVisualization = () => {
   );
 };
 
-const DetailModal = ({ item, onClose }) => {
+const DetailModal = ({ item, onClose, userRole, userId, onSectionChange }) => {
   const isEvent = item.geoType === 'events';
+  const isOwnEvent = isEvent && item.ngo_id === userId;
   
   return (
     <div className="ev-modal-overlay" onClick={onClose}>
@@ -322,7 +359,21 @@ const DetailModal = ({ item, onClose }) => {
 
         <div className="ev-modal-footer">
           <button className="ev-close-btn" onClick={onClose}>Close Exploration</button>
-          {isEvent && <button className="ev-reg-btn">Register Now</button>}
+          {isEvent && userRole === 'volunteer' && (
+            <button className="ev-reg-btn">Register Now</button>
+          )}
+          {isOwnEvent && userRole === 'ngo' && (
+            <button 
+              className="ev-reg-btn" 
+              style={{ background: '#3b82f6' }} 
+              onClick={() => {
+                onSectionChange?.('manage-events');
+                onClose();
+              }}
+            >
+              🛠️ Manage Event
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -20,9 +20,10 @@ const navItems = [
   { id: 'crises', label: 'Crisis Broadcast', icon: AlertTriangle },
   { id: 'analytics', label: 'Impact Analytics', icon: PieChart },
   { id: 'impact-score', label: 'Community Impact Score', icon: Award },
-  { id: 'certificates', label: 'Certificate Generator', icon: FileBadge },
+  // { id: 'certificates', label: 'Certificate Generator', icon: FileBadge },
   { id: 'heatmap', label: 'Category Heat Map', icon: Map },
   { id: 'notifications', label: 'Notifications', icon: Bell },
+  
 ];
 
 const Sidebar = ({ activeSection, onSectionChange }) => {

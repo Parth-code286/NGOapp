@@ -40,7 +40,7 @@ const NGODashboard = () => {
       case 'attendance':
         return <ComingSoon title="Attendance Tracking" />;
       case 'visualization':
-        return <EventVisualization />;
+        return <EventVisualization onSectionChange={setActiveSection} />;
       case 'chat':
         navigate('/chat'); return null;
       case 'volunteers':
