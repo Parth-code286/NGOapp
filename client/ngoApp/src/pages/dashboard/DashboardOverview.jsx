@@ -99,8 +99,8 @@ const DashboardOverview = ({ onSectionChange }) => {
           <p className="overview-subtitle">Here's what's happening with your NGO today.</p>
         </div>
         <div className="header-actions">
-          <button className="btn btn-secondary manage-btn" onClick={() => onSectionChange('manage-events')}>
-            ⚙️ Manage Events
+          <button className="btn btn-secondary discover-btn" onClick={() => onSectionChange('browse-volunteers')}>
+            🔍 Discover Volunteers
           </button>
           <button className="btn btn-primary create-btn" onClick={() => onSectionChange('create-event')}>
             + Create New Event
