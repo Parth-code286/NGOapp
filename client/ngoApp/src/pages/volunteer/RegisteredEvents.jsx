@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import EventDetailModal from '../../components/EventDetailModal';
 import './BrowseEvents.css'; /* Reuse same base styles */
 import './RegisteredEvents.css';
 
@@ -19,6 +20,7 @@ const RegisteredEvents = () => {
   const [loading,        setLoading]       = useState(true);
   const [error,          setError]         = useState('');
   const [cancelStatus,   setCancelStatus]  = useState({});
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     if (!user.id) return;
@@ -114,15 +116,24 @@ const RegisteredEvents = () => {
                       </div>
                       <div className="re-card-right">
                         <span className={`re-mode ${ev.mode?.toLowerCase()}`}>{ev.mode}</span>
-                        {reg.status === 'pending' || reg.status === 'approved' ? (
-                          <button
+                        <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+                          <button 
                             className="re-cancel-btn"
-                            onClick={() => handleCancel(ev.id, reg.id)}
-                            disabled={cancelStatus[reg.id] === 'loading'}
+                            style={{ padding: '0.4rem 0.6rem', color: '#0f172a', backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }}
+                            onClick={() => setSelectedEvent(ev)}
                           >
-                            {cancelStatus[reg.id] === 'loading' ? 'Cancelling…' : 'Cancel'}
+                            👁 Details
                           </button>
-                        ) : null}
+                          {reg.status === 'pending' || reg.status === 'approved' ? (
+                            <button
+                              className="re-cancel-btn"
+                              onClick={() => handleCancel(ev.id, reg.id)}
+                              disabled={cancelStatus[reg.id] === 'loading'}
+                            >
+                              {cancelStatus[reg.id] === 'loading' ? 'Cancelling…' : 'Cancel'}
+                            </button>
+                          ) : null}
+                        </div>
                       </div>
                     </div>
                   );
@@ -156,10 +167,18 @@ const RegisteredEvents = () => {
                           <span>⏱ {ev.volunteering_hours}h volunteered</span>
                         </div>
                       </div>
-                      <div className="re-card-right">
+                      <div className="re-card-right" style={{ alignItems: 'flex-end', gap: '0.5rem' }}>
+                        <span className={`re-mode ${ev.mode?.toLowerCase()}`}>{ev.mode}</span>
                         {ev.certificate_provided && reg.status === 'approved' && (
                           <span className="re-cert-badge">🎓 Certificate Earned</span>
                         )}
+                        <button 
+                          className="re-cancel-btn"
+                          style={{ padding: '0.4rem 0.6rem', color: '#0f172a', backgroundColor: '#f8fafc', borderColor: '#e2e8f0', marginTop: 'auto' }}
+                          onClick={() => setSelectedEvent(ev)}
+                        >
+                          👁 Details
+                        </button>
                       </div>
                     </div>
                   );
@@ -168,6 +187,13 @@ const RegisteredEvents = () => {
             </div>
           )}
         </>
+      )}
+
+      {selectedEvent && (
+        <EventDetailModal
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+        />
       )}
     </div>
   );

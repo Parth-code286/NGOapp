@@ -6,6 +6,9 @@ import ManageEvents from './ManageEvents';
 import BrowseVolunteers from './BrowseVolunteers';
 import NGOProfile from './NGOProfile';
 import AnalyticsHeatmap from './AnalyticsHeatmap';
+import VolunteerNotifications from '../volunteer/VolunteerNotifications';
+import EventVisualization from '../volunteer/EventVisualization';
+import VolunteerParticipation from './VolunteerParticipation';
 import './NGODashboard.css';
 
 // Placeholder section for unbuilt features
@@ -33,11 +36,11 @@ const NGODashboard = () => {
       case 'attendance':
         return <ComingSoon title="Attendance Tracking" />;
       case 'visualization':
-        return <ComingSoon title="Event Visualization" />;
+        return <EventVisualization />;
       case 'chat':
         return <ComingSoon title="Chat Section" />;
       case 'volunteers':
-        return <ComingSoon title="Volunteer Participation Tracking" />;
+        return <VolunteerParticipation />;
       case 'analytics':
         return <ComingSoon title="Impact Analytical Dashboard" />;
       case 'heatmap':
@@ -49,7 +52,7 @@ const NGODashboard = () => {
       case 'heatmap':
         return <ComingSoon title="Category Heat Map" />;
       case 'notifications':
-        return <ComingSoon title="Notifications" />;
+        return <VolunteerNotifications />;
       case 'profile':
         return <NGOProfile />;
       default:

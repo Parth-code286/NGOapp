@@ -1,83 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './BrowseVolunteers.css';
 
-// Dummy volunteer data
-const VOLUNTEERS = [
-  {
-    id: 1, name: 'Ananya Sharma', age: 23, gender: 'Female', city: 'Mumbai', state: 'Maharashtra',
-    email: 'ananya.sharma@email.com', phone: '+91 98765 43210', nationality: 'Indian',
-    interests: 'Environment', aadhar: 'XXXX-XXXX-1234', pan: 'ABCDE1234F',
-    eventsAttended: 12, hoursVolunteered: 48, impactPoints: 3200, rating: 4.9,
-    skills: ['Teaching', 'Photography', 'Social Media'],
-    about: 'Passionate about environmental conservation and youth education. Available on weekends.',
-    avatar: 'A', joined: 'Jan 2026',
-  },
-  {
-    id: 2, name: 'Rahul Mehta', age: 27, gender: 'Male', city: 'Pune', state: 'Maharashtra',
-    email: 'rahul.mehta@email.com', phone: '+91 87654 32109', nationality: 'Indian',
-    interests: 'Healthcare', aadhar: 'XXXX-XXXX-5678', pan: 'FGHIJ5678K',
-    eventsAttended: 10, hoursVolunteered: 40, impactPoints: 2980, rating: 4.7,
-    skills: ['Medical Support', 'Logistics', 'Crowd Management'],
-    about: 'Medical student with experience in health camps and first aid.',
-    avatar: 'R', joined: 'Dec 2025',
-  },
-  {
-    id: 3, name: 'Priya Singh', age: 21, gender: 'Female', city: 'Delhi', state: 'Delhi',
-    email: 'priya.singh@email.com', phone: '+91 76543 21098', nationality: 'Indian',
-    interests: 'Education', aadhar: 'XXXX-XXXX-9012', pan: 'KLMNO9012P',
-    eventsAttended: 9, hoursVolunteered: 36, impactPoints: 2740, rating: 4.8,
-    skills: ['Teaching', 'Counseling', 'Social Media'],
-    about: 'Education enthusiast. Loves conducting workshops and mentoring young students.',
-    avatar: 'P', joined: 'Feb 2026',
-  },
-  {
-    id: 4, name: 'Arjun Nair', age: 29, gender: 'Male', city: 'Bangalore', state: 'Karnataka',
-    email: 'arjun.nair@email.com', phone: '+91 65432 10987', nationality: 'Indian',
-    interests: 'Community Service',  aadhar: 'XXXX-XXXX-3456', pan: 'QRSTU3456V',
-    eventsAttended: 8, hoursVolunteered: 32, impactPoints: 2400, rating: 4.6,
-    skills: ['IT Support', 'Logistics', 'Photography'],
-    about: 'Software engineer by day, community builder by heart. Runs a local coding bootcamp.',
-    avatar: 'A', joined: 'Jan 2026',
-  },
-  {
-    id: 5, name: 'Meera Joshi', age: 25, gender: 'Female', city: 'Jaipur', state: 'Rajasthan',
-    email: 'meera.joshi@email.com', phone: '+91 54321 09876', nationality: 'Indian',
-    interests: 'Animal Welfare', aadhar: 'XXXX-XXXX-7890', pan: 'WXYZA7890B',
-    eventsAttended: 7, hoursVolunteered: 28, impactPoints: 2100, rating: 4.5,
-    skills: ['Medical Support', 'Teaching', 'Cooking'],
-    about: 'Animal lover with experience in shelter management and veterinary support.',
-    avatar: 'M', joined: 'Mar 2026',
-  },
-  {
-    id: 6, name: 'Vikram Rao', age: 31, gender: 'Male', city: 'Chennai', state: 'Tamil Nadu',
-    email: 'vikram.rao@email.com', phone: '+91 43210 98765', nationality: 'Indian',
-    interests: 'Disaster Relief', aadhar: 'XXXX-XXXX-2345', pan: 'CDEFG2345H',
-    eventsAttended: 15, hoursVolunteered: 60, impactPoints: 4500, rating: 5.0,
-    skills: ['Logistics', 'Crowd Management', 'Construction'],
-    about: 'Ex-army officer with extensive disaster management experience.',
-    avatar: 'V', joined: 'Nov 2025',
-  },
-];
-
+const API_BASE = 'http://localhost:5053';
 const INTERESTS = ['All', 'Environment', 'Healthcare', 'Education', 'Community Service', 'Animal Welfare', 'Disaster Relief'];
-
 const AVATAR_COLORS = ['#fcba03', '#3b82f6', '#22c55e', '#a855f7', '#f97316', '#14b8a6'];
 
 const BrowseVolunteers = () => {
+  const [volunteers, setVolunteers] = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState('');
+  
   const [search, setSearch]         = useState('');
   const [filter, setFilter]         = useState('All');
   const [selected, setSelected]     = useState(null);
+  const [recruiting, setRecruiting] = useState(null); // volunteer being recruited
+  const [ngoEvents, setNgoEvents]   = useState([]);
   const [recruited, setRecruited]   = useState(new Set());
+  const [inviteError, setInviteError] = useState('');
 
-  const filtered = VOLUNTEERS.filter(v => {
-    const matchSearch  = v.name.toLowerCase().includes(search.toLowerCase()) ||
-                         v.city.toLowerCase().includes(search.toLowerCase());
-    const matchFilter  = filter === 'All' || v.interests === filter;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  // ─── Fetch real volunteers ────────────────────────────────────────
+  useEffect(() => {
+    const fetchVolunteers = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE}/api/volunteer`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch volunteers');
+        
+        // Map backend fields to UI fields
+        const mapped = (data.volunteers || []).map(v => ({
+          ...v,
+          age: v.dob ? new Date().getFullYear() - new Date(v.dob).getFullYear() : 'N/A',
+          eventsAttended: v.events_attended || 0,
+          impactPoints: v.points || 0,
+          hoursVolunteered: v.points ? Math.floor(v.points / 10) : 0, // Mock calculation for now
+          rating: v.rating || 4.5, // Mock default rating
+          skills: v.skills || [],
+          about: v.about || 'A passionate volunteer ready to make an impact.',
+          avatar: v.name ? v.name.charAt(0).toUpperCase() : 'V',
+          joined: v.created_at ? new Date(v.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : 'N/A'
+        }));
+        
+        setVolunteers(mapped);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVolunteers();
+
+    // Fetch NGO events for recruitment
+    if (user.id && user.role === 'ngo') {
+      const fetchNgoEvents = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/events/ngo/${user.id}`);
+          const data = await res.json();
+          if (res.ok) setNgoEvents(data.events || []);
+        } catch (err) {
+          console.error("Failed to fetch NGO events", err);
+        }
+      };
+      fetchNgoEvents();
+    }
+  }, [user.id]);
+
+  const filtered = volunteers.filter(v => {
+    const matchSearch  = (v.name || '').toLowerCase().includes(search.toLowerCase()) ||
+                         (v.city || '').toLowerCase().includes(search.toLowerCase());
+    
+    // Some interests in DB might be comma separated or an array. To be safe:
+    let matchFilter = filter === 'All';
+    if (!matchFilter) {
+      if (Array.isArray(v.interests)) {
+        matchFilter = v.interests.includes(filter);
+      } else if (typeof v.interests === 'string') {
+        matchFilter = v.interests.includes(filter);
+      }
+    }
     return matchSearch && matchFilter;
   });
 
-  const handleRecruit = (id) => {
-    setRecruited(prev => new Set([...prev, id]));
+  const handleRecruit = async (eventId, volunteerId, eventTitle) => {
+    setInviteError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/invites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          volunteerId,
+          ngoId: user.id,
+          eventId,
+          ngoName: user.name,
+          eventTitle
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to recruit');
+      
+      setRecruited(prev => new Set([...prev, volunteerId]));
+      setRecruiting(null);
+    } catch (err) {
+      setInviteError(err.message);
+    }
   };
 
   return (
@@ -108,68 +142,99 @@ const BrowseVolunteers = () => {
         </div>
       </div>
 
-      <div className="bv-count">{filtered.length} volunteer{filtered.length !== 1 ? 's' : ''} found</div>
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '4rem', color: '#64748b' }}>
+          Loading volunteers...
+        </div>
+      )}
 
-      <div className="bv-grid">
-        {filtered.map((v, i) => (
-          <div className="bv-card" key={v.id}>
-            <div className="bv-card-top">
-              <div className="bv-avatar" style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}>
-                {v.avatar}
-              </div>
-              <div className="bv-card-info">
-                <div className="bv-name">{v.name}</div>
-                <div className="bv-meta">{v.city}, {v.state}</div>
-                <div className="bv-interest-pill">{v.interests}</div>
-              </div>
-              <div className="bv-rating">⭐ {v.rating}</div>
-            </div>
+      {error && !loading && (
+        <div style={{ padding: '1.5rem', background: '#fee2e2', color: '#b91c1c', borderRadius: '12px' }}>
+          ⚠️ {error}
+        </div>
+      )}
 
-            <div className="bv-stats">
-              <div className="bv-stat">
-                <div className="bv-stat-val">{v.eventsAttended}</div>
-                <div className="bv-stat-lbl">Events</div>
-              </div>
-              <div className="bv-stat">
-                <div className="bv-stat-val">{v.hoursVolunteered}h</div>
-                <div className="bv-stat-lbl">Hours</div>
-              </div>
-              <div className="bv-stat">
-                <div className="bv-stat-val">{v.impactPoints.toLocaleString()}</div>
-                <div className="bv-stat-lbl">Points</div>
-              </div>
-            </div>
+      {!loading && !error && (
+        <>
+          <div className="bv-count">{filtered.length} volunteer{filtered.length !== 1 ? 's' : ''} found</div>
 
-            <div className="bv-skills">
-              {v.skills.slice(0, 3).map(s => (
-                <span className="bv-skill-tag" key={s}>{s}</span>
-              ))}
-            </div>
+          <div className="bv-grid">
+            {filtered.map((v, i) => (
+              <div className="bv-card" key={v.id}>
+                <div className="bv-card-top">
+                  <div className="bv-avatar" style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}>
+                    {v.avatar}
+                  </div>
+                  <div className="bv-card-info">
+                    <div className="bv-name">{v.name}</div>
+                    <div className="bv-meta">{v.city || 'Unknown'}, {v.state || 'Unknown'}</div>
+                    <div className="bv-interest-pill">
+                      {Array.isArray(v.interests) ? v.interests[0] : (v.interests ? v.interests.split(',')[0] : 'General')}
+                    </div>
+                  </div>
+                  <div className="bv-rating">⭐ {v.rating}</div>
+                </div>
 
-            <div className="bv-card-actions">
-              <button className="bv-view-btn" onClick={() => setSelected(v)}>
-                👁 View Details
-              </button>
-              <button
-                className={`bv-recruit-btn ${recruited.has(v.id) ? 'recruited' : ''}`}
-                onClick={() => handleRecruit(v.id)}
-                disabled={recruited.has(v.id)}
-              >
-                {recruited.has(v.id) ? '✅ Recruited' : '+ Recruit'}
-              </button>
-            </div>
+                <div className="bv-stats">
+                  <div className="bv-stat">
+                    <div className="bv-stat-val">{v.eventsAttended}</div>
+                    <div className="bv-stat-lbl">Events</div>
+                  </div>
+                  <div className="bv-stat">
+                    <div className="bv-stat-val">{v.hoursVolunteered}h</div>
+                    <div className="bv-stat-lbl">Hours</div>
+                  </div>
+                  <div className="bv-stat">
+                    <div className="bv-stat-val">{v.impactPoints.toLocaleString()}</div>
+                    <div className="bv-stat-lbl">Points</div>
+                  </div>
+                </div>
+
+                <div className="bv-skills">
+                  {v.skills.length > 0 ? v.skills.slice(0, 3).map(s => (
+                    <span className="bv-skill-tag" key={s}>{s}</span>
+                  )) : (
+                    <span className="bv-skill-tag">General Volunteer</span>
+                  )}
+                </div>
+
+                <div className="bv-card-actions">
+                  <button className="bv-view-btn" onClick={() => setSelected(v)}>
+                    👁 View Details
+                  </button>
+                  <button
+                    className={`bv-recruit-btn ${recruited.has(v.id) ? 'recruited' : ''}`}
+                    onClick={() => setRecruiting(v)}
+                    disabled={recruited.has(v.id)}
+                  >
+                    {recruited.has(v.id) ? '✅ Invited' : '+ Recruit'}
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
 
       {/* Detail Popup */}
       {selected && (
         <VolunteerDetailModal
           volunteer={selected}
-          color={AVATAR_COLORS[VOLUNTEERS.findIndex(v => v.id === selected.id) % AVATAR_COLORS.length]}
+          color={AVATAR_COLORS[volunteers.findIndex(v => v.id === selected.id) % AVATAR_COLORS.length]}
           onClose={() => setSelected(null)}
           recruited={recruited.has(selected.id)}
-          onRecruit={() => { handleRecruit(selected.id); }}
+          onRecruit={() => setRecruiting(selected)}
+        />
+      )}
+
+      {/* Recruit Modal */}
+      {recruiting && (
+        <RecruitModal 
+          volunteer={recruiting}
+          events={ngoEvents}
+          onClose={() => { setRecruiting(null); setInviteError(''); }}
+          onConfirm={handleRecruit}
+          error={inviteError}
         />
       )}
     </div>
@@ -185,8 +250,10 @@ const VolunteerDetailModal = ({ volunteer: v, color, onClose, recruited, onRecru
         <div className="bv-modal-avatar" style={{ background: color }}>{v.avatar}</div>
         <div>
           <div className="bv-modal-name">{v.name}</div>
-          <div className="bv-modal-sub">{v.city}, {v.state} · Joined {v.joined}</div>
-          <div className="bv-interest-pill" style={{ marginTop: '0.4rem' }}>{v.interests}</div>
+          <div className="bv-modal-sub">{v.city || 'Unknown'}, {v.state || 'Unknown'} · Joined {v.joined}</div>
+          <div className="bv-interest-pill" style={{ marginTop: '0.4rem' }}>
+            {Array.isArray(v.interests) ? v.interests.join(', ') : (v.interests || 'General')}
+          </div>
         </div>
         <div className="bv-modal-rating">⭐ {v.rating}</div>
       </div>
@@ -210,23 +277,23 @@ const VolunteerDetailModal = ({ volunteer: v, color, onClose, recruited, onRecru
         <div className="bv-detail-section">
           <h4>Personal Details</h4>
           <div className="bv-detail-row"><span>Age</span><span>{v.age} years</span></div>
-          <div className="bv-detail-row"><span>Gender</span><span>{v.gender}</span></div>
-          <div className="bv-detail-row"><span>Nationality</span><span>{v.nationality}</span></div>
+          <div className="bv-detail-row"><span>Gender</span><span>{v.gender || 'N/A'}</span></div>
+          <div className="bv-detail-row"><span>Nationality</span><span>{v.nationality || 'N/A'}</span></div>
         </div>
         <div className="bv-detail-section">
           <h4>Contact</h4>
           <div className="bv-detail-row"><span>Email</span><span>{v.email}</span></div>
-          <div className="bv-detail-row"><span>Phone</span><span>{v.phone}</span></div>
+          <div className="bv-detail-row"><span>Phone</span><span>{v.phone || 'N/A'}</span></div>
         </div>
         <div className="bv-detail-section">
           <h4>Identity</h4>
-          <div className="bv-detail-row"><span>Aadhar</span><span>{v.aadhar}</span></div>
-          <div className="bv-detail-row"><span>PAN</span><span>{v.pan}</span></div>
+          <div className="bv-detail-row"><span>Aadhar</span><span>{v.aadhar ? 'Provided ✅' : 'Not provided ❌'}</span></div>
+          <div className="bv-detail-row"><span>PAN</span><span>{v.pan ? 'Provided ✅' : 'Not provided ❌'}</span></div>
         </div>
         <div className="bv-detail-section">
           <h4>Skills</h4>
           <div className="bv-skills" style={{ marginTop: '0.5rem' }}>
-            {v.skills.map(s => <span className="bv-skill-tag" key={s}>{s}</span>)}
+            {v.skills.length > 0 ? v.skills.map(s => <span className="bv-skill-tag" key={s}>{s}</span>) : <span className="bv-skill-tag">General</span>}
           </div>
         </div>
       </div>
@@ -240,6 +307,44 @@ const VolunteerDetailModal = ({ volunteer: v, color, onClose, recruited, onRecru
         >
           {recruited ? '✅ Volunteer Recruited' : '🤝 Recruit Volunteer'}
         </button>
+      </div>
+    </div>
+  </div>
+);
+
+const RecruitModal = ({ volunteer, events, onClose, onConfirm, error }) => (
+  <div className="bv-modal-overlay" onClick={onClose}>
+    <div className="bv-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+      <button className="bv-modal-close" onClick={onClose}>✕</button>
+      <h2 style={{ marginBottom: '1rem' }}>Recruit {volunteer.name}</h2>
+      <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+        Select an event to invite this volunteer to. They will receive a notification and can accept or decline.
+      </p>
+
+      {error && <div style={{ color: '#dc2626', background: '#fef2f2', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem' }}>⚠️ {error}</div>}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '300px', overflowY: 'auto' }}>
+        {events.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>No active events found. Create an event first!</p>
+        ) : (
+          events.map(ev => (
+            <div 
+              key={ev.id} 
+              className="be-card" 
+              style={{ cursor: 'pointer', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}
+              onClick={() => onConfirm(ev.id, volunteer.id, ev.title)}
+            >
+              <h4 style={{ margin: 0 }}>{ev.title}</h4>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.25rem' }}>
+                📅 {new Date(ev.event_date).toLocaleDateString()} · 📍 {ev.city}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <button className="bv-view-btn" onClick={onClose}>Cancel</button>
       </div>
     </div>
   </div>

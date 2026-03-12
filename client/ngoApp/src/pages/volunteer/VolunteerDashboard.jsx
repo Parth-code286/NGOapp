@@ -6,6 +6,10 @@ import BrowseEvents from './BrowseEvents';
 import RegisteredEvents from './RegisteredEvents';
 import VolunteerProfile from './VolunteerProfile';
 import Gamification from './Gamification';
+import VolunteerNotifications from './VolunteerNotifications';
+import NGOListing from './NGOListing';
+import CheckInvites from './CheckInvites';
+import EventVisualization from './EventVisualization';
 import '../dashboard/NGODashboard.css';
 
 const ComingSoon = ({ title }) => (
@@ -27,12 +31,13 @@ const VolunteerDashboard = () => {
       case 'calendar':       return <DesignCalendar />;
       case 'browse':         return <BrowseEvents />;
       case 'registered':     return <RegisteredEvents />;
+      case 'invites':        return <CheckInvites />;
+      case 'ngo-listing':    return <NGOListing />;
       case 'certificates':   return <ComingSoon title="Certificates Earned" />;
-      case 'visualization':  return <ComingSoon title="Event Visualization" />;
-      case 'community':      return <ComingSoon title="Community & Leaderboard" />;
+      case 'visualization':  return <EventVisualization />;
+      case 'community':      return <Gamification />;
       case 'chat':           return <ComingSoon title="Chat Section" />;
-      case 'gamification':   return <Gamification />;
-      case 'notifications':  return <ComingSoon title="Notifications" />;
+      case 'notifications':  return <VolunteerNotifications />;
       case 'attendance':     return <ComingSoon title="Attendance Section" />;
       case 'profile':        return <VolunteerProfile />;
       default:               return <VolunteerOverview />;

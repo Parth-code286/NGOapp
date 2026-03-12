@@ -136,150 +136,8 @@ const ManageEvents = () => {
   // ────────────────────────────────────────────────────────
   //  RENDER: Detail View
   // ────────────────────────────────────────────────────────
-  if (selectedEvent) {
-    const ev = selectedEvent;
-    return (
-      <div className="me-wrapper">
-        <button className="me-back-btn" onClick={() => setSelectedEvent(null)}>
-          ← Back to Events
-        </button>
+  if (loading && !events.length) return <div className="me-loading"><div className="me-spinner" /><p>Loading your events…</p></div>;
 
-        <div className="me-header">
-          <h1 className="me-title">{ev.title}</h1>
-          <p className="me-subtitle">
-            <span className={`me-status-dot ${ev.status || 'published'}`}>
-              {(ev.status || 'published').charAt(0).toUpperCase() + (ev.status || 'published').slice(1)}
-            </span>
-            {' · '}{ev.category} · {ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
-          </p>
-        </div>
-
-        {detailLoading ? (
-          <div className="me-loading"><div className="me-spinner" /><p>Loading details…</p></div>
-        ) : (
-          <div className="me-detail">
-            {/* ── Event Info Card ── */}
-            <div className="me-detail-card">
-              <h3>📋 Event Details</h3>
-              <div className="me-info-grid">
-                <div className="me-info-item">
-                  <span className="info-label">Date</span>
-                  <span className="info-value">{ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-IN') : '—'}</span>
-                </div>
-                <div className="me-info-item">
-                  <span className="info-label">Time</span>
-                  <span className="info-value">{ev.start_time?.slice(0,5)} – {ev.end_time?.slice(0,5)}</span>
-                </div>
-                <div className="me-info-item">
-                  <span className="info-label">Mode</span>
-                  <span className="info-value">{ev.mode || '—'}</span>
-                </div>
-                <div className="me-info-item">
-                  <span className="info-label">Location</span>
-                  <span className="info-value">{ev.venue_name ? `${ev.venue_name}, ${ev.city}` : ev.meeting_link ? 'Online' : '—'}</span>
-                </div>
-                <div className="me-info-item">
-                  <span className="info-label">Total Volunteers</span>
-                  <span className="info-value">{ev.total_volunteers || '—'}</span>
-                </div>
-                <div className="me-info-item">
-                  <span className="info-label">Registration Deadline</span>
-                  <span className="info-value">{ev.registration_deadline ? new Date(ev.registration_deadline).toLocaleDateString('en-IN') : '—'}</span>
-                </div>
-              </div>
-              {ev.description && (
-                <div style={{ marginTop: '1.25rem' }}>
-                  <span className="info-label" style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Description</span>
-                  <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, fontSize: '0.9rem' }}>{ev.description}</p>
-                </div>
-              )}
-            </div>
-
-            {/* ── Roles Card ── */}
-            <div className="me-detail-card">
-              <h3>👥 Volunteer Roles ({roles.length})</h3>
-              {roles.length === 0 ? (
-                <p className="me-no-data">No roles defined for this event.</p>
-              ) : (
-                <div className="me-role-list">
-                  {roles.map(role => (
-                    <div className="me-role-row" key={role.id}>
-                      <div className="me-role-info">
-                        <div className="me-role-name">{role.role_name}</div>
-                        {role.role_description && <div className="me-role-desc">{role.role_description}</div>}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span className="me-role-count">{role.volunteers_required} needed</span>
-                        <button className="me-icon-btn danger" title="Delete role" onClick={() => handleDeleteRole(role.id)}>🗑</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ── Registrations Card ── */}
-            <div className="me-detail-card">
-              <h3>📝 Volunteer Registrations ({registrations.length})</h3>
-              {registrations.length === 0 ? (
-                <p className="me-no-data">No volunteers have registered yet.</p>
-              ) : (
-                <div className="me-table-wrap">
-                  <table className="me-table">
-                    <thead>
-                      <tr>
-                        <th>Volunteer</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>City</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {registrations.map(reg => {
-                        const vol = reg.volunteers || {};
-                        return (
-                          <tr key={reg.id}>
-                            <td><span className="me-vol-name">{vol.name || '—'}</span></td>
-                            <td><span className="me-vol-email">{vol.email || '—'}</span></td>
-                            <td>{vol.phone || '—'}</td>
-                            <td>{vol.city || '—'}</td>
-                            <td>
-                              <span className={`me-reg-status ${reg.status || 'pending'}`}>
-                                {(reg.status || 'pending').charAt(0).toUpperCase() + (reg.status || 'pending').slice(1)}
-                              </span>
-                            </td>
-                            <td>
-                              <div className="me-action-group">
-                                {reg.status !== 'approved' && (
-                                  <button className="me-act-btn approve" onClick={() => updateRegStatus(reg.id, 'approved')}>✓ Approve</button>
-                                )}
-                                {reg.status !== 'rejected' && (
-                                  <button className="me-act-btn reject" onClick={() => updateRegStatus(reg.id, 'rejected')}>✗ Reject</button>
-                                )}
-                                {reg.status !== 'waitlisted' && (
-                                  <button className="me-act-btn waitlist" onClick={() => updateRegStatus(reg.id, 'waitlisted')}>⏳ Waitlist</button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ────────────────────────────────────────────────────────
-  //  RENDER: Event List View
-  // ────────────────────────────────────────────────────────
   const published = events.filter(e => e.status === 'published' || !e.status);
   const past      = events.filter(e => e.status === 'completed' || e.status === 'cancelled');
   const drafts    = events.filter(e => e.status === 'draft');
@@ -290,10 +148,6 @@ const ManageEvents = () => {
         <h1 className="me-title">Manage Events</h1>
         <p className="me-subtitle">View, edit, and manage all your organisation's events.</p>
       </div>
-
-      {loading && (
-        <div className="me-loading"><div className="me-spinner" /><p>Loading your events…</p></div>
-      )}
 
       {error && !loading && (
         <div className="me-error">⚠️ {error}</div>
@@ -353,6 +207,18 @@ const ManageEvents = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* ═══ Event Detail Popup Modal ═══ */}
+      {selectedEvent && (
+        <EventDetailModal 
+          event={selectedEvent} 
+          loading={detailLoading} 
+          roles={roles} 
+          registrations={registrations} 
+          onClose={() => setSelectedEvent(null)}
+          onDeleteRole={handleDeleteRole}
+        />
       )}
 
       {/* ═══ Edit Modal ═══ */}
@@ -443,5 +309,150 @@ const ManageEvents = () => {
     </div>
   );
 };
+
+// ─────────────────────────────────────────────────────────────
+//  EventDetailModal — popup card with event info, roles & regs
+// ─────────────────────────────────────────────────────────────
+const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, onDeleteRole }) => (
+  <div className="me-modal-overlay" onClick={onClose}>
+    <div className="me-modal detail-modal" onClick={e => e.stopPropagation()}>
+      <button className="me-modal-close" onClick={onClose}>✕</button>
+
+      {ev.banner_url && (
+        <img src={ev.banner_url} alt={ev.title} className="me-modal-banner" />
+      )}
+
+      <div className="me-modal-header">
+        <h2 className="me-title" style={{ fontSize: '1.4rem' }}>{ev.title}</h2>
+        <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.4rem' }}>
+          <span className={`me-status-dot ${ev.status || 'published'}`}>
+            {(ev.status || 'published').charAt(0).toUpperCase() + (ev.status || 'published').slice(1)}
+          </span>
+          <span className="me-category-tag">{ev.category}</span>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="me-loading-small">
+          <div className="me-spinner" />
+          <p>Loading event details…</p>
+        </div>
+      ) : (
+        <div className="me-modal-content">
+          <div className="me-detail-grid">
+            <div className="me-detail-card-popup">
+              <h3>📋 Event Information</h3>
+              <div className="me-info-grid-popup">
+                <div className="me-info-item">
+                  <span className="info-label">Date</span>
+                  <span className="info-value">{ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}</span>
+                </div>
+                <div className="me-info-item">
+                  <span className="info-label">Time</span>
+                  <span className="info-value">{ev.start_time?.slice(0,5)} – {ev.end_time?.slice(0,5)}</span>
+                </div>
+                <div className="me-info-item">
+                  <span className="info-label">Registration Deadline</span>
+                  <span className="info-value">{ev.registration_deadline ? new Date(ev.registration_deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}</span>
+                </div>
+                <div className="me-info-item">
+                  <span className="info-label">Mode</span>
+                  <span className="info-value" style={{textTransform: 'capitalize'}}>{ev.mode || '—'}</span>
+                </div>
+                <div className="me-info-item">
+                  <span className="info-label">Volunteer Goal</span>
+                  <span className="info-value">{ev.total_volunteers || 0} volunteers</span>
+                </div>
+                <div className="me-info-item">
+                  <span className="info-label">Hours / Points</span>
+                  <span className="info-value">{ev.volunteering_hours || 0}h · {ev.impact_points || 0} pts</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '1.25rem' }}>
+                <span className="info-label">Location / Link</span>
+                <p className="me-popup-location">
+                  {ev.mode === 'online' ? (
+                    <a href={ev.meeting_link} target="_blank" rel="noreferrer" style={{color: 'var(--primary-dark)'}}>{ev.meeting_link || 'Link not provided'}</a>
+                  ) : (
+                    <>
+                      <strong>{ev.venue_name || 'Venue Name'}</strong><br />
+                      {ev.address_line1 && <>{ev.address_line1}<br /></>}
+                      {ev.address_line2 && <>{ev.address_line2}<br /></>}
+                      {ev.city}, {ev.state} {ev.postal_code}<br />
+                      {ev.country}
+                    </>
+                  )}
+                </p>
+              </div>
+
+              <div style={{ marginTop: '1.25rem' }}>
+                <span className="info-label">About the Event</span>
+                <p className="me-popup-description">{ev.description || 'No description provided.'}</p>
+              </div>
+            </div>
+
+            <div className="me-detail-card-popup">
+              <h3>👥 Roles ({roles.length})</h3>
+              <div className="me-role-list-popup">
+                {roles.length === 0 ? (
+                  <p className="me-no-data">No roles created yet.</p>
+                ) : (
+                  roles.map(role => (
+                    <div className="me-role-row-popup" key={role.id}>
+                      <div>
+                        <div className="me-role-name-popup">{role.role_name}</div>
+                        <div className="me-role-count-popup">{role.volunteers_required} slots</div>
+                      </div>
+                      <button className="me-icon-btn danger" onClick={() => onDeleteRole(role.id)}>🗑</button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="me-detail-card-popup" style={{ marginTop: '1.25rem' }}>
+            <h3>📝 Registrations ({registrations.length})</h3>
+            <div className="me-table-wrap-popup">
+              <table className="me-table-popup">
+                <thead>
+                  <tr>
+                    <th>Volunteer</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {registrations.length === 0 ? (
+                    <tr><td colSpan="4" className="me-no-data">No registrations yet.</td></tr>
+                  ) : (
+                    registrations.map(reg => (
+                      <tr key={reg.id}>
+                        <td><span className="me-vol-name">{reg.volunteers?.name || '—'}</span></td>
+                        <td>{reg.volunteers?.email || '—'}</td>
+                        <td>{reg.volunteers?.city || '—'}</td>
+                        <td>
+                          <span className={`me-reg-status ${reg.status || 'pending'}`}>
+                            {(reg.status || 'pending').charAt(0).toUpperCase() + (reg.status || 'pending').slice(1)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="me-modal-actions-popup">
+        <button className="btn btn-secondary" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  </div>
+);
 
 export default ManageEvents;
