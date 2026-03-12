@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import DashboardOverview from './DashboardOverview';
 import CreateEvent from './CreateEvent';
@@ -26,6 +27,7 @@ const ComingSoon = ({ title }) => (
 
 const NGODashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
+  const navigate = useNavigate();
 
   const renderContent = () => {
     switch (activeSection) {
@@ -40,7 +42,7 @@ const NGODashboard = () => {
       case 'visualization':
         return <EventVisualization />;
       case 'chat':
-        return <ComingSoon title="Chat Section" />;
+        navigate('/chat'); return null;
       case 'volunteers':
         return <VolunteerParticipation />;
       case 'crises':

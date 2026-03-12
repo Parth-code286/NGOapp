@@ -15,7 +15,7 @@ const navItems = [
   { id: 'browse-volunteers', label: 'Browse Volunteers', icon: Search },
   { id: 'attendance', label: 'Attendance Tracking', icon: UserCheck, url: 'https://ngo-attendance.vercel.app' },
   { id: 'visualization', label: 'Event Visualization', icon: BarChart2 },
-  { id: 'chat', label: 'Chat Section', icon: MessageSquare },
+  { id: 'chat', label: 'Chat Section', icon: MessageSquare, route: '/chat' },
   { id: 'volunteers', label: 'Volunteer Participation', icon: Users },
   { id: 'crises', label: 'Crisis Broadcast', icon: AlertTriangle },
   { id: 'analytics', label: 'Impact Analytics', icon: PieChart },
@@ -69,6 +69,8 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
             onClick={() => {
               if (item.url) {
                 window.open(item.url, '_blank');
+              } else if (item.route) {
+                navigate(item.route);
               } else {
                 onSectionChange(item.id);
               }
