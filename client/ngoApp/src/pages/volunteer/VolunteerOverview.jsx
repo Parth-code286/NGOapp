@@ -59,25 +59,35 @@ const VolunteerOverview = ({ onSectionChange }) => {
         })) || [];
 
       // 4. Fetch Past Events (Attendance)
+      // Removed .order('created_at') because attendance table might lack it
       const { data: attendance } = await supabase
         .from('attendance')
         .select('*, events(title, event_date)')
-        .eq('volunteer_id', user.id)
-        .order('created_at', { ascending: false });
+        .eq('volunteer_id', user.id);
 
       const past = attendance?.map(a => ({
-        name: a.events.title,
-        date: new Date(a.events.event_date).toLocaleDateString(),
-        hours: 4, // Placeholder for hours per event
-        points: 100, // Placeholder
+        name: a.events?.title || 'Unknown Event',
+        date: a.events?.event_date ? new Date(a.events.event_date).toLocaleDateString() : '—',
+        hours: 4, 
+        points: 100, 
         attended: a.verified
       })) || [];
 
-      // 5. Fetch Certificates
-      const { count: certCount } = await supabase
-        .from('certificates')
-        .select('*', { count: 'exact', head: true })
-        .eq('volunteer_id', user.id);
+      // 5. Fetch Certificates (Wrapped in try-catch to handle 404 if table missing)
+      let certCount = 0;
+      try {
+        const { count, error: certError } = await supabase
+          .from('certificates')
+          .select('*', { count: 'exact', head: true })
+          .eq('volunteer_id', user.id);
+        
+        if (!certError) certCount = count || 0;
+        else if (certError.code === 'PGRST116' || certError.message.includes('not found')) {
+            console.warn('Certificates table not found. Defaulting to 0.');
+        }
+      } catch (e) {
+        console.warn('Certificates table missing:', e);
+      }
 
       setStats([
         { label: 'Events Registered',   value: registeredCount, icon: '📋', color: 'stat-blue' },
