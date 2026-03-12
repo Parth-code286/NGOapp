@@ -6,13 +6,14 @@ import '../dashboard/Sidebar.css';
 import {
   LayoutDashboard, CalendarRange, Search, ClipboardList, Mail,
   Building2, FileBadge, BarChart2, Award, AlertTriangle,
-  MessageSquare, Bell, UserCheck, User, LogOut
+  MessageSquare, Bell, UserCheck, User, LogOut, BadgeCheck
 } from 'lucide-react';
 
 const volunteerNavItems = [
   { id: 'overview',     label: 'Dashboard',            icon: LayoutDashboard },
+  { id: 'browse',      label: 'Browse Events',         icon: Search },
+  { id: 'subscriptions',label: 'Subscription Tiers',    icon: BadgeCheck },
   { id: 'calendar',    label: 'Design Calendar',       icon: CalendarRange },
-  // { id: 'browse',      label: 'Browse Events',         icon: Search },
   { id: 'registered',  label: 'Registered Events',     icon: ClipboardList },
   { id: 'invites',     label: 'Check Invites',         icon: Mail },
   { id: 'visualization',label: 'Event Visualization',  icon: BarChart2 },

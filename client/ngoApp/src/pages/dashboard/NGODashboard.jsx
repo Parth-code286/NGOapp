@@ -13,6 +13,7 @@ import ImpactAnalytics from './ImpactAnalytics';
 import AnalyticsHeatmap from './AnalyticsHeatmap';
 import ImpactScore from './ImpactScore';
 import CrisisManagement from './CrisisManagement';
+import WalletView from './WalletView';
 import './NGODashboard.css';
 
 // Placeholder section for unbuilt features
@@ -34,6 +35,7 @@ const NGODashboard = () => {
     switch (activeSection) {
       case 'overview':
         return <DashboardOverview onSectionChange={setActiveSection} />;
+      case 'wallet': return <WalletView />;
       case 'create-event': return <CreateEvent />;
       case 'browse-volunteers': return <BrowseVolunteers />;
       case 'manage-events':

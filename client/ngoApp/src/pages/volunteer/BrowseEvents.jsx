@@ -30,6 +30,8 @@ const BrowseEvents = () => {
       try {
         const params = new URLSearchParams();
         if (category !== 'All') params.append('category', category);
+        if (user.id) params.append('volunteer_id', user.id);
+        
         const res  = await fetch(`${API_BASE}/events?${params}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
