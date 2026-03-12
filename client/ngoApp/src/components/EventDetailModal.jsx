@@ -47,7 +47,6 @@ const EventDetailModal = ({ event, onClose, actionButton, actionDisabled }) => {
               <div className="edm-row"><span>Hours Provided</span><span>{event.volunteering_hours}h</span></div>
               <div className="edm-row"><span>Things to bring</span><span>{event.things_to_bring || 'Nothing specific'}</span></div>
               <div className="edm-perks">
-                {event.certificate_provided && <span className="edm-perk-tag">🎓 Certificate</span>}
                 {event.meals_provided       && <span className="edm-perk-tag">🍽 Meals</span>}
                 {event.travel_allowance     && <span className="edm-perk-tag">🚌 Travel</span>}
               </div>

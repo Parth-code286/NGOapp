@@ -181,10 +181,6 @@ const DashboardOverview = ({ onSectionChange }) => {
           <div className="qc-icon">📢</div>
           <div><div className="qc-title">Send Notification</div><div className="qc-sub">Broadcast to volunteers</div></div>
         </div>
-        <div className="quick-card blue" onClick={() => onSectionChange('certificates')}>
-          <div className="qc-icon">🎓</div>
-          <div><div className="qc-title">Certificates</div><div className="qc-sub">Automated issuance</div></div>
-        </div>
         <div className="quick-card green" onClick={() => onSectionChange('analytics')}>
           <div className="qc-icon">📊</div>
           <div><div className="qc-title">Analytics</div><div className="qc-sub">Data-driven insights</div></div>

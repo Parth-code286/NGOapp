@@ -109,7 +109,7 @@ const NGOSignup = ({ onBack, onClose }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="cert80g">80G Certificate Upload (Optional)</label>
+          <label htmlFor="cert80g">80G Verification Document (Optional)</label>
           <input type="file" id="cert80g" className="form-input" accept="application/pdf" />
         </div>
 

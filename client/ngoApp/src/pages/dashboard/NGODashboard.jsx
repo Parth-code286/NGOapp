@@ -54,8 +54,6 @@ const NGODashboard = () => {
         return <AnalyticsHeatmap />;
       case 'impact-score':
         return <ImpactScore />;
-      case 'certificates':
-        return <ComingSoon title="Volunteer Certificate Generator" />;
       case 'notifications':
         return <VolunteerNotifications />;
       case 'profile':

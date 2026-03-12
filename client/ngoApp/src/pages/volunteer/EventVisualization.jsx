@@ -343,17 +343,39 @@ const DetailModal = ({ item, onClose, userRole, userId, onSectionChange }) => {
               </div>
             </div>
           ) : (
-            <div className="ev-modal-grid">
-              <div className="m-info">
-                <h4>Contact</h4>
-                <p>📧 {item.official_email}</p>
-                <p>📞 {item.phone || 'N/A'}</p>
+            <>
+              <div className="ev-modal-grid">
+                <div className="m-info">
+                  <h4>About & Mission</h4>
+                  <p>✨ {item.type || 'Community Impact'}</p>
+                  <p>📜 {item.mission || 'Dedicated to social welfare and community development.'}</p>
+                  {item.founded_year && <p>🗓️ Founded in {item.founded_year}</p>}
+                </div>
+                <div className="m-info">
+                  <h4>Contact Info</h4>
+                  <p>📧 {item.official_email}</p>
+                  <p>📞 {item.phone || 'N/A'}</p>
+                  {item.website && (
+                    <p>🌐 <a href={item.website} target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Official Website</a></p>
+                  )}
+                </div>
               </div>
-              <div className="m-info">
-                <h4>Mission</h4>
-                <p>✨ {item.type || 'Community Impact'}</p>
-              </div>
-            </div>
+              <section className="ev-modal-section" style={{ marginTop: '1.5rem' }}>
+                <h4>Location Details</h4>
+                <p>🏠 {item.address || 'Address not provided'}</p>
+                <p>📍 {item.city}, {item.state} - {item.pincode}</p>
+              </section>
+              {item.registration_no && (
+                <section className="ev-modal-section" style={{ marginTop: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '12px', fontSize: '0.85rem' }}>
+                  <h4 style={{ marginBottom: '0.5rem' }}>Registration info</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <div><b>Reg No:</b> {item.registration_no}</div>
+                    {item.pan && <div><b>PAN:</b> {item.pan}</div>}
+                    {item.reg_12a && <div><b>12A:</b> {item.reg_12a}</div>}
+                  </div>
+                </section>
+              )}
+            </>
           )}
         </div>
 

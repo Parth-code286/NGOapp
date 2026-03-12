@@ -23,9 +23,12 @@ const DesignCalendar = () => {
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
 
   const startYear  = today.getFullYear();
+  const startMonth = today.getMonth();
   const allMonths  = [];
-  for (let y = startYear; y <= startYear + 2; y++) {
-    for (let m = 0; m < 12; m++) {
+  
+  for (let y = startYear; y <= startYear + 1; y++) {
+    const mStart = (y === startYear) ? startMonth : 0;
+    for (let m = mStart; m < 12; m++) {
       allMonths.push({ year: y, month: m });
     }
   }

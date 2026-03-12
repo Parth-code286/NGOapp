@@ -9,7 +9,6 @@ import VolunteerProfile from './VolunteerProfile';
 import Community from './Community';
 import Leaderboard from './Leaderboard';
 import VolunteerNotifications from './VolunteerNotifications';
-import NGOListing from './NGOListing';
 import CheckInvites from './CheckInvites';
 import EventVisualization from './EventVisualization';
 import VolunteerCrises from './VolunteerCrises';
@@ -36,9 +35,8 @@ const VolunteerDashboard = () => {
       case 'browse':         return <BrowseEvents />;
       case 'registered':     return <RegisteredEvents />;
       case 'invites':        return <CheckInvites />;
-      case 'ngo-listing':    return <NGOListing />;
       case 'visualization':  return <EventVisualization />;
-      case 'community':      return <Community />;
+      case 'community':      return <Community onSectionChange={setActiveSection} />;
       case 'leaderboard':    return <Leaderboard />;
       case 'chat':           { navigate('/chat'); return null; }
       case 'crises':         return <VolunteerCrises />;
