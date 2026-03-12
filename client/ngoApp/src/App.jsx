@@ -9,19 +9,29 @@ import NGODashboard from './pages/dashboard/NGODashboard';
 import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
 import ChatPage from './chat/pages/ChatPage';
 import Chatbot from './components/Chatbot/Chatbot';
+import { PrivateRoute, PublicRoute } from './components/auth/RouteGuards';
+import NotFoundPage from './pages/NotFoundPage';
 
 const App = () => {
   return (
     <>
       <Routes>
+        {/* Public pages — always accessible */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupChoicePage />} />
-        <Route path="/signup/volunteer" element={<VolunteerSignupPage />} />
-        <Route path="/signup/ngo" element={<NGOSignupPage />} />
-        <Route path="/dashboard/ngo" element={<NGODashboard />} />
-        <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
-        <Route path="/chat" element={<ChatPage/>} />
+
+        {/* Auth pages — redirect to dashboard if already logged in */}
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><SignupChoicePage /></PublicRoute>} />
+        <Route path="/signup/volunteer" element={<PublicRoute><VolunteerSignupPage /></PublicRoute>} />
+        <Route path="/signup/ngo" element={<PublicRoute><NGOSignupPage /></PublicRoute>} />
+
+        {/* Protected dashboards — redirect to /login if not logged in */}
+        <Route path="/dashboard/ngo" element={<PrivateRoute role="ngo"><NGODashboard /></PrivateRoute>} />
+        <Route path="/dashboard/volunteer" element={<PrivateRoute role="volunteer"><VolunteerDashboard /></PrivateRoute>} />
+        <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
+
+        {/* 404 catch-all — must be last */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Chatbot />
     </>
