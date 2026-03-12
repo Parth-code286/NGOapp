@@ -116,7 +116,7 @@ export const eventModel = {
     registerVolunteer: async (registrationData) => {
         const { data, error } = await supabase
             .from("event_registrations")
-            .insert(registrationData)
+            .insert({ ...registrationData, status: 'pending' })
             .select()
             .single();
         if (error) throw new Error(error.message);
@@ -129,6 +129,28 @@ export const eventModel = {
             .from("event_registrations")
             .select("*, volunteers(id, name, email, phone, city)")
             .eq("event_id", eventId);
+        if (error) throw new Error(error.message);
+        return data || [];
+    },
+
+    // Get all registrations for all events of an NGO
+    getRegistrationsByNGO: async (ngoId) => {
+        // First get all event IDs for this NGO
+        const { data: events, error: evError } = await supabase
+            .from("events")
+            .select("id")
+            .eq("ngo_id", ngoId);
+        
+        if (evError) throw new Error(evError.message);
+        if (!events || events.length === 0) return [];
+
+        const eventIds = events.map(e => e.id);
+
+        const { data, error } = await supabase
+            .from("event_registrations")
+            .select("*, volunteers(id, name, email, phone, city), events(id, title, category, event_date)")
+            .in("event_id", eventIds);
+
         if (error) throw new Error(error.message);
         return data || [];
     },
