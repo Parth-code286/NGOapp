@@ -14,6 +14,7 @@ export const registerVolunteer = async (req, res) => {
       city, state, country, pincode,
       lat, lng,
       aadhar, pan, skills, password,
+      id_proof_url, skill_proof_url,
     } = req.body;
     
     // Check if email already exists
@@ -48,6 +49,8 @@ export const registerVolunteer = async (req, res) => {
         pan,
         skills,
         password_hash: passwordHash,
+        id_proof_url,
+        skill_proof_url,
       }])
       .select()
       .single();

@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import './Auth.css';
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 const VolunteerSignup = ({ onBack, onClose }) => {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherSkill, setOtherSkill] = useState('');
+
+  const [idProofFile, setIdProofFile] = useState(null);
+  const [skillProofFile, setSkillProofFile] = useState(null);
 
   const skillsList = [
     'Education & Tutoring',
@@ -42,6 +47,25 @@ const VolunteerSignup = ({ onBack, onClose }) => {
     }
   };
 
+  const uploadFile = async (file, folder) => {
+    if (!file) return null;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${folder}/${fileName}`;
+
+    const { error: uploadError, data } = await supabase.storage
+      .from('volunteer-documents')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('volunteer-documents')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -55,23 +79,6 @@ const VolunteerSignup = ({ onBack, onClose }) => {
       allSkills.push(otherSkill.trim());
     }
 
-    const payload = {
-      fullName: form.fullName.value,
-      dob: form.dob.value,
-      gender: form.gender.value,
-      nationality: form.nationality.value,
-      email: form.email.value,
-      phone: form.phone.value,
-      city: form.city.value,
-      state: form.state.value,
-      country: form.country.value,
-      pincode: form.pincode.value,
-      aadhar: form.aadhar.value,
-      pan: form.pan.value,
-      skills: allSkills,
-      password: form['v-password'].value,
-    };
-
     if (allSkills.length === 0) {
       setError('Please select at least one skill.');
       setLoading(false);
@@ -79,6 +86,31 @@ const VolunteerSignup = ({ onBack, onClose }) => {
     }
 
     try {
+      setUploading(true);
+      // Upload files to Supabase Storage
+      const idProofUrl = await uploadFile(idProofFile, 'id-proofs');
+      const skillProofUrl = await uploadFile(skillProofFile, 'skill-proofs');
+      setUploading(false);
+
+      const payload = {
+        fullName: form.fullName.value,
+        dob: form.dob.value,
+        gender: form.gender.value,
+        nationality: form.nationality.value,
+        email: form.email.value,
+        phone: form.phone.value,
+        city: form.city.value,
+        state: form.state.value,
+        country: form.country.value,
+        pincode: form.pincode.value,
+        aadhar: form.aadhar.value,
+        pan: form.pan.value,
+        skills: allSkills,
+        password: form['v-password'].value,
+        id_proof_url: idProofUrl,
+        skill_proof_url: skillProofUrl,
+      };
+
       const res = await fetch(`${API_BASE}/auth/register/volunteer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,6 +126,7 @@ const VolunteerSignup = ({ onBack, onClose }) => {
       setError(err.message);
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -185,7 +218,28 @@ const VolunteerSignup = ({ onBack, onClose }) => {
 
         <div className="form-group col-span-2">
           <label htmlFor="idProof">ID Proof Upload (Aadhar/PAN/Passport)</label>
-          <input type="file" id="idProof" name="idProof" className="form-input" accept="image/*,.pdf" />
+          <input 
+            type="file" 
+            id="idProof" 
+            name="idProof" 
+            className="form-input" 
+            accept="image/*,.pdf" 
+            onChange={(e) => setIdProofFile(e.target.files[0])}
+          />
+        </div>
+
+        <div className="form-group col-span-2">
+          <label htmlFor="skillProof">Skill Certificate/Proof (PDF or Image)</label>
+          <input 
+            type="file" 
+            id="skillProof" 
+            name="skillProof" 
+            className="form-input" 
+            accept="image/*,.pdf" 
+            required
+            onChange={(e) => setSkillProofFile(e.target.files[0])}
+          />
+          <small className="form-help">Please upload a certificate or document verifying your expertise.</small>
         </div>
 
         <h3 className="form-section-header">Skills & Account</h3>
@@ -248,8 +302,8 @@ const VolunteerSignup = ({ onBack, onClose }) => {
           <input type="password" id="v-password" name="v-password" className="form-input" placeholder="Minimum 8 characters" minLength={8} required />
         </div>
 
-        <button type="submit" className="btn btn-primary w-full submit-btn col-span-2" disabled={loading}>
-          {loading ? 'Registering...' : 'Complete Registration'}
+        <button type="submit" className="btn btn-primary w-full submit-btn col-span-2" disabled={loading || uploading}>
+          {uploading ? 'Uploading Documents...' : (loading ? 'Registering...' : 'Complete Registration')}
         </button>
       </form>
     </div>

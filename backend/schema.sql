@@ -28,6 +28,8 @@ CREATE TABLE volunteers (
     -- Documents
     aadhar           TEXT,
     pan              TEXT,
+    id_proof_url     TEXT,
+    skill_proof_url  TEXT,
 
     -- Profile
     interests        TEXT,
