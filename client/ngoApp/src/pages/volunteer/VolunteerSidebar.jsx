@@ -24,7 +24,7 @@ const volunteerNavItems = [
   { id: 'attendance',  label: 'Attendance Section',    icon: UserCheck, url: 'https://ngo-attendance.vercel.app' },
 ];
 
-const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
+const VolunteerSidebar = ({ activeSection, onSectionChange, isOpen, onClose }) => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [unreadCount, setUnreadCount] = React.useState(0);
@@ -68,9 +68,14 @@ const VolunteerSidebar = ({ activeSection, onSectionChange }) => {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo">
-        <span className="logo-text">Impact<span className="text-primary">Hub</span></span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="logo-text">Impact<span className="text-primary">Hub</span></span>
+          <button className="sidebar-close show-on-mobile" onClick={onClose}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
         <div className="ngo-badge" style={{ backgroundColor: '#dbeafe', color: '#1d4ed8' }}>Volunteer Portal</div>
       </div>
 

@@ -54,10 +54,23 @@
 }
 
 @media (max-width: 640px) {
-  .auth-card-header {
-    padding: 2rem 1.5rem 1rem;
+  .auth-page-container {
+    padding: 1.5rem 1rem;
   }
+
+  .auth-card {
+    border-radius: 16px;
+  }
+
+  .auth-card-header {
+    padding: 2rem 1.25rem 0.5rem;
+  }
+
+  .auth-card-title {
+    font-size: 1.5rem;
+  }
+
   .auth-card-body {
-    padding: 1rem 1.5rem 2rem;
+    padding: 1rem 1.25rem 2rem;
   }
 }

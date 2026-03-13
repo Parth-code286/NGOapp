@@ -34,20 +34,27 @@ const Navbar = ({ onLoginClick, onSignupClick }) => {
     }
   };
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''} ${isMenuOpen ? 'menu-open' : ''}`}>
       <div className="container nav-content">
         <a href="/" className="logo" onClick={handleLogoClick}>
           Impact<span className="text-primary">Hub</span>
         </a>
 
-        <div className="nav-links">
-          <a href="#features" className="nav-link">{t('nav.features', 'Features')}</a>
-          <a href="#how-it-works" className="nav-link">How it Works</a>
-          <a href="#about" className="nav-link">{t('nav.about', 'About Us')}</a>
+        <div className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
+          <a href="#features" className="nav-link" onClick={() => setIsMenuOpen(false)}>{t('nav.features', 'Features')}</a>
+          <a href="#how-it-works" className="nav-link" onClick={() => setIsMenuOpen(false)}>How it Works</a>
+          <a href="#about" className="nav-link" onClick={() => setIsMenuOpen(false)}>{t('nav.about', 'About Us')}</a>
+          
+          <div className="nav-mobile-actions show-on-mobile">
+             <button className="btn btn-secondary w-full" onClick={() => { onLoginClick(); setIsMenuOpen(false); }}>{t('nav.login', 'Log In')}</button>
+             <button className="btn btn-primary w-full" onClick={() => { onSignupClick(); setIsMenuOpen(false); }}>Sign Up Free</button>
+          </div>
         </div>
 
-        <div className="nav-actions">
+        <div className="nav-actions hide-on-mobile">
           <select
             className="lang-switcher"
             style={{ padding: '0.4rem', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)', cursor: 'pointer', outline: 'none', marginRight: '0.5rem' }}
@@ -61,6 +68,14 @@ const Navbar = ({ onLoginClick, onSignupClick }) => {
           <button className="btn btn-secondary" onClick={onLoginClick}>{t('nav.login', 'Log In')}</button>
           <button className="btn btn-primary" onClick={onSignupClick}>Sign Up Free</button>
         </div>
+
+        <button className="menu-toggle show-on-mobile-flex" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <div className={`hamburger ${isMenuOpen ? 'active' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
       </div>
     </nav>
   );

@@ -41,6 +41,32 @@ ul {
   padding: 0 1.5rem;
 }
 
+@media (max-width: 640px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+.hide-on-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.show-on-mobile {
+  display: none !important;
+  @media (max-width: 768px) {
+    display: block !important;
+  }
+}
+
+.show-on-mobile-flex {
+  display: none !important;
+  @media (max-width: 768px) {
+    display: flex !important;
+  }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -79,6 +105,7 @@ ul {
 .text-gradient {
   background: linear-gradient(135deg, var(--text-main) 0%, #4b5563 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

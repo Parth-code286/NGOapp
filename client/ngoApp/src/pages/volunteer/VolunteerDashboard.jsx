@@ -27,6 +27,7 @@ const ComingSoon = ({ title }) => (
 
 const VolunteerDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const renderContent = () => {
@@ -50,11 +51,26 @@ const VolunteerDashboard = () => {
   };
 
   return (
-    <div className="dashboard-layout">
-      <VolunteerSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+    <div className={`dashboard-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      <VolunteerSidebar 
+        activeSection={activeSection} 
+        onSectionChange={(section) => {
+          setActiveSection(section);
+          setIsSidebarOpen(false);
+        }}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       <main className="dashboard-main">
+        <header className="dashboard-header show-on-mobile-flex">
+          <button className="menu-toggle-btn" onClick={() => setIsSidebarOpen(true)}>
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <span className="logo-text">Impact<span className="text-primary">Hub</span></span>
+        </header>
         {renderContent()}
       </main>
+      {isSidebarOpen && <div className="sidebar-overlay show-on-mobile" onClick={() => setIsSidebarOpen(false)}></div>}
     </div>
   );
 };
