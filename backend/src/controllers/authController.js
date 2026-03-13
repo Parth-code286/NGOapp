@@ -13,9 +13,9 @@ export const registerVolunteer = async (req, res) => {
       email, phone,
       city, state, country, pincode,
       lat, lng,
-      aadhar, pan, interests, password,
+      aadhar, pan, skills, password,
     } = req.body;
-
+    
     // Check if email already exists
     const { data: existing } = await supabase
       .from("volunteers")
@@ -46,7 +46,7 @@ export const registerVolunteer = async (req, res) => {
         lng: lng || null,
         aadhar,
         pan,
-        interests,
+        skills,
         password_hash: passwordHash,
       }])
       .select()
@@ -110,15 +110,18 @@ export const registerNGO = async (req, res) => {
         auth_person_mobile: authMobile,
         auth_person_email: authEmail,
         password_hash: passwordHash,
+        verification_status: 'pending',
+        is_verified: false
       }])
       .select()
       .single();
 
     if (error) throw error;
 
-    const token = jwt.sign({ id: data.id, role: "ngo" }, JWT_SECRET, { expiresIn: "7d" });
-
-    res.status(201).json({ message: "NGO registered successfully.", token, user: { id: data.id, name: data.name, email: data.official_email, role: "ngo" } });
+    res.status(201).json({ 
+      message: "Registration submitted successfully! Please wait for admin approval. You will be notified via email once your account is verified.",
+      user: { id: data.id, name: data.name, email: data.official_email, role: "ngo" } 
+    });
   } catch (err) {
     console.error("NGO registration error:", err.message);
     res.status(500).json({ error: err.message });
@@ -160,6 +163,17 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, data.password_hash);
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    if (role === "ngo") {
+      if (data.verification_status === 'pending') {
+        return res.status(403).json({ error: "Your account is pending admin approval. Please wait for verification." });
+      }
+      if (data.verification_status === 'rejected') {
+        return res.status(403).json({ 
+          error: `Your account has been rejected. Reason: ${data.rejection_reason || 'No reason provided.'}. You can re-register with correct information.` 
+        });
+      }
     }
 
     const token = jwt.sign({ id: data.id, role }, JWT_SECRET, { expiresIn: "7d" });

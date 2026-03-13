@@ -39,15 +39,33 @@ const NGOSignup = ({ onBack, onClose }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      onClose();
+      
+      // Instead of logging in, show success message
+      setSuccess(true);
+      // Wait 5 seconds then close or redirect
+      setTimeout(() => {
+        onClose();
+      }, 6000);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  const [success, setSuccess] = useState(false);
+
+  if (success) {
+    return (
+      <div className="auth-form-container success-view">
+        <div className="success-icon">✅</div>
+        <h2>Registration Submitted!</h2>
+        <p>Your organization's details have been sent for verification.</p>
+        <p><strong>Note:</strong> You will not be able to log in until an admin approves your request. You will receive an email notification once the verification is complete.</p>
+        <button className="btn btn-primary" onClick={onClose}>Finish</button>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-form-container">

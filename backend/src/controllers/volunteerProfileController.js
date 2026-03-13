@@ -58,7 +58,7 @@ export const updateVolunteerProfile = async (req, res) => {
       name, dob, gender, nationality,
       email, phone,
       city, state, country, pincode,
-      aadhar, pan, interests,
+      aadhar, pan, skills,
     } = req.body;
 
     // Build update object — only include fields that are provided
@@ -75,7 +75,7 @@ export const updateVolunteerProfile = async (req, res) => {
     if (pincode !== undefined) updates.pincode = pincode;
     if (aadhar !== undefined) updates.aadhar = aadhar;
     if (pan !== undefined) updates.pan = pan;
-    if (interests !== undefined) updates.interests = interests;
+    if (skills !== undefined) updates.skills = skills;
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: "No fields to update." });

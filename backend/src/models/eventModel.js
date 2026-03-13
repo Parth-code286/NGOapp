@@ -127,7 +127,7 @@ export const eventModel = {
     getRegistrationsByEvent: async (eventId) => {
         const { data, error } = await supabase
             .from("event_registrations")
-            .select("*, volunteers(id, name, email, phone, city)")
+            .select("*, volunteers(id, name, email, phone, city, skills)")
             .eq("event_id", eventId);
         if (error) throw new Error(error.message);
         return data || [];
@@ -148,7 +148,7 @@ export const eventModel = {
 
         const { data, error } = await supabase
             .from("event_registrations")
-            .select("*, volunteers(id, name, email, phone, city), events(id, title, category, event_date)")
+            .select("*, volunteers(id, name, email, phone, city, skills), events(id, title, category, event_date)")
             .in("event_id", eventIds);
 
         if (error) throw new Error(error.message);

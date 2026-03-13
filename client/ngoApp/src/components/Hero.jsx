@@ -17,7 +17,14 @@ const Hero = () => {
           </p>
           <div className="hero-actions">
             <button className="btn btn-primary btn-lg">{t('hero.cta', 'Start for Free')}</button>
-            <button className="btn btn-secondary btn-lg btn-outline">Watch Demo</button>
+            <a 
+              href="https://drive.google.com/file/d/1QMZ9Kh5eSOJU4G8DU75IxspVCYT55vLw/view?usp=sharing" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="btn btn-secondary btn-lg btn-outline"
+            >
+              Watch Demo
+            </a>
           </div>
           
           <div className="stats-row">

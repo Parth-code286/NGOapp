@@ -71,6 +71,13 @@ CREATE TABLE ngos (
     total_volunteers    INTEGER DEFAULT 0,
     total_events        INTEGER DEFAULT 0,
     is_verified         BOOLEAN DEFAULT FALSE,
+    verification_status TEXT DEFAULT 'pending', -- 'pending', 'verified', 'rejected'
+    pan_url             TEXT,
+    tan_url             TEXT,
+    cert_12a_url        TEXT,
+    cert_80g_url        TEXT,
+    auth_id_url         TEXT,
+    rejection_reason    TEXT,
     created_at          TIMESTAMPTZ DEFAULT NOW()
 );
 

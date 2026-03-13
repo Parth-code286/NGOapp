@@ -289,3 +289,120 @@ input[type="file"]::file-selector-button:hover {
     grid-column: span 1;
   }
 }
+
+/* Skills Selection Grid */
+.skills-selection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.skill-tag {
+  padding: 0.4rem 1.1rem;
+  background-color: var(--bg-pure);
+  border: 1.5px solid var(--border-light);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.skill-tag:hover {
+  border-color: var(--primary);
+  background-color: var(--bg-off);
+  transform: translateY(-1px);
+}
+
+.skill-tag.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 10px var(--primary-light);
+}
+
+.skill-tag.other-toggle {
+  border-style: dashed;
+  color: var(--primary-dark);
+  background-color: var(--bg-off);
+}
+
+.skill-tag.custom {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.other-skill-input-group {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background-color: var(--bg-off);
+  border-radius: 16px;
+  border: 1px dashed var(--primary-light);
+}
+
+.input-with-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-with-button .form-input {
+  flex: 1;
+}
+
+.add-skill-btn {
+  padding: 0 1.5rem !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  white-space: nowrap;
+}
+
+/* Animations */
+.animate-slide-down {
+  animation: slideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Success View for Registration */
+.success-view {
+  text-align: center;
+  padding: 3rem 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.success-view h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.success-view p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.success-view strong {
+  color: var(--primary-dark);
+}

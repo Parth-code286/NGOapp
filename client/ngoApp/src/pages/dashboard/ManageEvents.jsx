@@ -481,6 +481,7 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
                       else setSelectedVols([]);
                     }} checked={selectedVols.length === registrations.length && registrations.length > 0} /></th>
                     <th>Volunteer</th>
+                    <th>Skills</th>
                     <th>Email</th>
                     <th>City</th>
                     <th>Status</th>
@@ -488,7 +489,7 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
                 </thead>
                 <tbody>
                   {registrations.length === 0 ? (
-                    <tr><td colSpan="5" className="me-no-data">No registrations yet.</td></tr>
+                    <tr><td colSpan="6" className="me-no-data">No registrations yet.</td></tr>
                   ) : (
                     registrations.map(reg => (
                       <tr key={reg.id}>
@@ -496,6 +497,17 @@ const EventDetailModal = ({ event: ev, loading, roles, registrations, onClose, o
                           <input type="checkbox" checked={selectedVols.includes(reg.volunteer_id)} onChange={() => toggleVol(reg.volunteer_id)} />
                         </td>
                         <td><span className="me-vol-name">{reg.volunteers?.name || '—'}</span></td>
+                        <td>
+                          <div className="me-skill-tags-mini">
+                            {reg.volunteers?.skills && reg.volunteers.skills.length > 0 ? (
+                              reg.volunteers.skills.map(skill => (
+                                <span key={skill} className="me-skill-mini-tag">{skill}</span>
+                              ))
+                            ) : (
+                              <span className="me-no-skills">—</span>
+                            )}
+                          </div>
+                        </td>
                         <td>{reg.volunteers?.email || '—'}</td>
                         <td>{reg.volunteers?.city || '—'}</td>
                         <td>

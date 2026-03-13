@@ -752,6 +752,31 @@
   }
 }
 
+/* ─── Mini Skills Tags in Table ─── */
+.me-skill-tags-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 250px;
+}
+
+.me-skill-mini-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  border: 1px solid var(--primary-light);
+}
+
+.me-no-skills {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* ─── Delete Confirm ─── */
 .me-confirm-msg {
   font-size: 1rem;

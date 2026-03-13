@@ -6,6 +6,41 @@ const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api`;
 const VolunteerSignup = ({ onBack, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [showOtherInput, setShowOtherInput] = useState(false);
+  const [otherSkill, setOtherSkill] = useState('');
+
+  const skillsList = [
+    'Education & Tutoring',
+    'Environmental Conservation',
+    'Healthcare & Medical',
+    'Animal Welfare',
+    'Community Development',
+    'Disaster Relief',
+    'Technical Support (IT)',
+    'Event Management',
+    'Social Media & Marketing',
+    'Content Writing',
+    'Graphic Designing',
+    'Research & Analysis',
+    'Funds Raising'
+  ];
+
+  const handleSkillToggle = (skill) => {
+    setSelectedSkills(prev => 
+      prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
+    );
+  };
+
+  const handleAddCustomSkill = () => {
+    if (otherSkill.trim()) {
+      const skillToAdd = otherSkill.trim();
+      if (!selectedSkills.includes(skillToAdd)) {
+        setSelectedSkills(prev => [...prev, skillToAdd]);
+      }
+      setOtherSkill('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,6 +48,13 @@ const VolunteerSignup = ({ onBack, onClose }) => {
     setError('');
 
     const form = e.target;
+    
+    // Combine selected skills and "Other" skill
+    const allSkills = [...selectedSkills];
+    if (showOtherInput && otherSkill.trim()) {
+      allSkills.push(otherSkill.trim());
+    }
+
     const payload = {
       fullName: form.fullName.value,
       dob: form.dob.value,
@@ -26,9 +68,15 @@ const VolunteerSignup = ({ onBack, onClose }) => {
       pincode: form.pincode.value,
       aadhar: form.aadhar.value,
       pan: form.pan.value,
-      interests: form.interests.value,
+      skills: allSkills,
       password: form['v-password'].value,
     };
+
+    if (allSkills.length === 0) {
+      setError('Please select at least one skill.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(`${API_BASE}/auth/register/volunteer`, {
@@ -39,7 +87,6 @@ const VolunteerSignup = ({ onBack, onClose }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       
-      // Save token and redirect
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       onClose();
@@ -141,20 +188,59 @@ const VolunteerSignup = ({ onBack, onClose }) => {
           <input type="file" id="idProof" name="idProof" className="form-input" accept="image/*,.pdf" />
         </div>
 
-        <h3 className="form-section-header">Interests & Account</h3>
+        <h3 className="form-section-header">Skills & Account</h3>
 
         <div className="form-group col-span-2">
-          <label htmlFor="interests">Area of Interest</label>
-          <select id="interests" name="interests" className="form-input" required>
-            <option value="">Select Primary Interest</option>
-            <option value="education">Education & Tutoring</option>
-            <option value="environment">Environmental Conservation</option>
-            <option value="health">Healthcare & Medical</option>
-            <option value="animal">Animal Welfare</option>
-            <option value="community">Community Development</option>
-            <option value="disaster">Disaster Relief</option>
-            <option value="other">Other</option>
-          </select>
+          <label>Add Skills (Select multiple)</label>
+          <div className="skills-selection-grid">
+            {skillsList.map(skill => (
+              <div 
+                key={skill} 
+                className={`skill-tag ${selectedSkills.includes(skill) ? 'active' : ''}`}
+                onClick={() => handleSkillToggle(skill)}
+              >
+                {skill}
+              </div>
+            ))}
+            
+            {/* Display added custom skills if they aren't in the predefined list */}
+            {selectedSkills.filter(s => !skillsList.includes(s)).map(customSkill => (
+              <div 
+                key={customSkill}
+                className="skill-tag active custom"
+                onClick={() => handleSkillToggle(customSkill)}
+              >
+                {customSkill} ✕
+              </div>
+            ))}
+
+            <div 
+              className={`skill-tag other-toggle ${showOtherInput ? 'active' : ''}`}
+              onClick={() => setShowOtherInput(!showOtherInput)}
+            >
+              {showOtherInput ? '- Hide Other' : '+ Add Other Skill'}
+            </div>
+          </div>
+          
+          {showOtherInput && (
+            <div className="other-skill-input-group animate-slide-down">
+              <label htmlFor="otherSkill">Custom Skill Name</label>
+              <div className="input-with-button">
+                <input 
+                  type="text" 
+                  id="otherSkill" 
+                  value={otherSkill}
+                  onChange={(e) => setOtherSkill(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomSkill())}
+                  className="form-input" 
+                  placeholder="e.g. Sign Language, First Aid" 
+                />
+                <button type="button" className="btn btn-primary add-skill-btn" onClick={handleAddCustomSkill}>
+                  Add
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="form-group col-span-2">

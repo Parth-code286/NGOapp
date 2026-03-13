@@ -228,11 +228,8 @@ const VolunteerDetailModal = ({ volunteer: v, onClose }) => (
           <div className="vp-detail-row"><span>PAN</span><span>{v.pan ? 'Provided ✅' : 'Not provided ❌'}</span></div>
         </div>
         <div className="vp-detail-section">
-          <h4>Interests & Skills</h4>
-          <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>
-            {Array.isArray(v.interests) ? v.interests.join(', ') : (v.interests || 'General')}
-          </p>
-          <div className="vp-modal-skills">
+          <h4>Skills & Expertise</h4>
+          <div className="vp-modal-skills" style={{ marginTop: '0.75rem' }}>
             {v.skills && v.skills.length > 0 ? v.skills.map(s => <span className="vp-skill-tag" key={s}>{s}</span>) : <span className="vp-skill-tag">General</span>}
           </div>
         </div>

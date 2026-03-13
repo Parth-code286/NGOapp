@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './Navbar.css';
 
@@ -14,10 +15,29 @@ const Navbar = ({ onLoginClick, onSignupClick }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const [logoClicks, setLogoClicks] = useState(0);
+  const [clickTimer, setClickTimer] = useState(null);
+  const navigate = useNavigate();
+
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    const newCount = logoClicks + 1;
+    
+    if (newCount === 5) {
+      setLogoClicks(0);
+      clearTimeout(clickTimer);
+      navigate('/admin/login');
+    } else {
+      setLogoClicks(newCount);
+      if (clickTimer) clearTimeout(clickTimer);
+      setClickTimer(setTimeout(() => setLogoClicks(0), 3000));
+    }
+  };
+
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="container nav-content">
-        <a href="/" className="logo">
+        <a href="/" className="logo" onClick={handleLogoClick}>
           Impact<span className="text-primary">Hub</span>
         </a>
 

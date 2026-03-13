@@ -74,13 +74,10 @@ const BrowseVolunteers = () => {
     const matchSearch  = (v.name || '').toLowerCase().includes(search.toLowerCase()) ||
                          (v.city || '').toLowerCase().includes(search.toLowerCase());
     
-    // Some interests in DB might be comma separated or an array. To be safe:
     let matchFilter = filter === 'All';
     if (!matchFilter) {
-      if (Array.isArray(v.interests)) {
-        matchFilter = v.interests.includes(filter);
-      } else if (typeof v.interests === 'string') {
-        matchFilter = v.interests.includes(filter);
+      if (v.skills && Array.isArray(v.skills)) {
+        matchFilter = v.skills.some(s => s.toLowerCase().includes(filter.toLowerCase()));
       }
     }
     return matchSearch && matchFilter;
@@ -169,7 +166,7 @@ const BrowseVolunteers = () => {
                     <div className="bv-name">{v.name}</div>
                     <div className="bv-meta">{v.city || 'Unknown'}, {v.state || 'Unknown'}</div>
                     <div className="bv-interest-pill">
-                      {Array.isArray(v.interests) ? v.interests[0] : (v.interests ? v.interests.split(',')[0] : 'General')}
+                      {v.skills && v.skills.length > 0 ? v.skills[0] : 'General'}
                     </div>
                   </div>
                   <div className="bv-rating">⭐ {v.rating}</div>
@@ -252,7 +249,7 @@ const VolunteerDetailModal = ({ volunteer: v, color, onClose, recruited, onRecru
           <div className="bv-modal-name">{v.name}</div>
           <div className="bv-modal-sub">{v.city || 'Unknown'}, {v.state || 'Unknown'} · Joined {v.joined}</div>
           <div className="bv-interest-pill" style={{ marginTop: '0.4rem' }}>
-            {Array.isArray(v.interests) ? v.interests.join(', ') : (v.interests || 'General')}
+            {v.skills && v.skills.length > 0 ? v.skills.slice(0, 3).join(', ') : 'General'}
           </div>
         </div>
         <div className="bv-modal-rating">⭐ {v.rating}</div>
