@@ -27,8 +27,9 @@ app.use(cors({
     "http://localhost:5173", 
     "http://localhost:5174", 
     "http://localhost:3000",
-    process.env.FRONTEND_URL // <-- Added to support your Vercel URL dynamically
-  ].filter(Boolean), // .filter(Boolean) safely removes undefined if FRONTEND_URL is not set yet
+    "https://ngo-omega-smoky.vercel.app", // Added Vercel Frontend
+    process.env.FRONTEND_URL 
+  ].filter(Boolean), 
   credentials: true,
 }));
 app.use(express.json());
