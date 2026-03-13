@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './Hero.css';
 
 const Hero = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <section className="hero">
       <div className="container hero-container">
@@ -16,7 +18,9 @@ const Hero = () => {
             {t('hero.subtitle', 'Connecting Passionate Volunteers with Meaningful NGO Events.')}
           </p>
           <div className="hero-actions">
-            <button className="btn btn-primary btn-lg">{t('hero.cta', 'Start for Free')}</button>
+            <button className="btn btn-primary btn-lg" onClick={() => navigate('/signup')}>
+              {t('hero.cta', 'Start for Free')}
+            </button>
             <a 
               href="https://drive.google.com/file/d/1QMZ9Kh5eSOJU4G8DU75IxspVCYT55vLw/view?usp=sharing" 
               target="_blank" 
